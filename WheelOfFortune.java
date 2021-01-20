@@ -17,10 +17,26 @@ import java.io.*;
 
 public class WheelOfFortune {
     Console console;
+    final int CONSOLE_WIDTH=1024;
+    final int CONSOLE_HEIGHT=768;
 
     // Class Constructor
     public WheelOfFortune() {
-        console = new Console();
+        // create a test console to calculate number of pixels per row and column
+        int pxPerRow,pxPerCol;
+        Console tmpConsole = new Console(1,1);
+        pxPerRow=tmpConsole.getHeight();
+        pxPerCol=tmpConsole.getWidth();
+        tmpConsole.close();
+
+        int consoleRows=CONSOLE_HEIGHT/pxPerRow;
+        int consoleCols=CONSOLE_WIDTH/pxPerCol;
+
+        console=new Console(consoleRows,consoleCols);
+        /*
+        console.println(console.getWidth());
+        console.println(console.getHeight());
+        */
     }
 
     private void drawLetterGrid(int x,int y, int squareSize, char[][] grid) {
@@ -28,13 +44,14 @@ public class WheelOfFortune {
 
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
-        try {
-            while (true) {    
+        /*
+            while (game.newRound()) {    
                 game.newRound();
             }
         }
         catch(UserExitException e) { // UserExitException is thrown when user wants to exit
             game.goodbye();
         }
+        */
     }
 }
