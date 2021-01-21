@@ -66,6 +66,12 @@ public class WheelOfFortune {
         console.drawString("" + key, (int)(x+168), (int)(y+33));
     }
 
+    private void drawHost(int x, int y) {
+        console.setColor(Color.black);
+        console.fillOval(x, y, 50, 50);
+        console.fillRect(x+5, y+45, 40, 100);
+    }
+
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
         char[][] chardata = new char[6][24];
@@ -75,6 +81,7 @@ public class WheelOfFortune {
         game.drawLetterGrid(10, 10, 30, chardata);
         game.drawButton(100, 500, "Button", 'X', false);
         game.drawButton(400, 500, "Action", 'Y', true);
+        game.drawHost(600, 600);
         /*
             while (game.newRound()) {    
                 game.newRound();
