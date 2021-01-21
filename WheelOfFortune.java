@@ -23,7 +23,13 @@ public class WheelOfFortune {
         console = new Console();
     }
 
-    private void drawLetterGrid(int x,int y, int squareSize, char[][] grid) {
+    private void drawLetterGrid(int x, int y, int squareSize, char[][] grid) {
+        for (int i=0; i<grid[0].length; i++) {
+            for (int j=0; j<grid.length; j++) {
+                console.drawRect(x + squareSize*i, y + squareSize*j, squareSize, squareSize);
+                console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.45)), (int)(y + squareSize*(j+0.55)));
+            }
+        }
     }
 
     public static void main(String[] args) {
