@@ -14,19 +14,58 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import hsa.Console;
 import java.io.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.Iterator;
 
 public class WheelOfFortune {
-    Console console;
-    final int CONSOLE_WIDTH=1024;
-    final int CONSOLE_HEIGHT=768;
+    class PlayerScore implements Comparable
+    {
+        public final String playerName;
+        public final int score;
+        public PlayerScore(String pn,int sc)
+        {
+            score=sc;
+            playerName=pn;
+        }
+        public int compareTo(Object o)
+        {
+            PlayerScore other=(PlayerScore)o;
+            if(score==other.score)
+            {
+                return playerName.compareTo(other.playerName);
+            }
+            else
+            {
+                return new Integer(score).compareTo(new Integer(other.score));
+            }
+        }
+        public String toString() // only here for TESTING
+        {
+            return playerName+" -> "+score;
+        } 
+    }
+    private Console console;
+    public final int CONSOLE_WIDTH=1024;
+    public final int CONSOLE_HEIGHT=768;
 
-    final int LOSE_TURN=-1;
-    final int BANKRUPT=-2;
+    public final String PHRASE_FILE_NAME="phrases.wof_data";
+    public final String SCORE_FILE_NAME="scores.wof";
 
-    final int[] WHEEL_VALUES={
+    private static final int LOSE_TURN=-1;
+    private static final int BANKRUPT=-2;
+
+    private final int[] WHEEL_VALUES={
         LOSE_TURN,2500,700,600,550,
         BANKRUPT,600,550,500,800,
         LOSE_TURN,800,500,900,500};
+
+    private Map phrases;
+    private List playerScores;
 
     // Class Constructor
     public WheelOfFortune() {
@@ -41,25 +80,12 @@ public class WheelOfFortune {
         int consoleCols=CONSOLE_WIDTH/pxPerCol;
 
         console=new Console(consoleRows,consoleCols);
-        /*
-        console.println(console.getWidth());
-        console.println(console.getHeight());
-        */
 
-        for(double ang=0;;ang+=0.01)
-        {
-            drawWheel(400,400,200,ang);
-            try
-            {
-            Thread.sleep(30);
-
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-
-        }
+        phrases=new HashMap();
+        playerScores=new ArrayList();
+        
+        readPhrasesFromFile();
+        readScoresFromFile();
     }
 
     private void drawWheelBaseToGraphics(Graphics2D graphics,Color[] WHEEL_COLORS,int radius, double angle)
@@ -181,8 +207,165 @@ public class WheelOfFortune {
         console.fillRect(x+5, y+45, 40, 100);
     }
 
+    private String parseCategoryMarker(String line)
+    {   // returns the category name if line is a category marker
+        // returns an empty string otherwise
+        if(line.length()==0)
+        {
+            return "";
+        }
+        else if(line.charAt(line.length()-1)==':')
+        {
+            return line.substring(0,line.length()-1);
+        }
+        else
+        {
+            return "";
+        }
+    }
+    private String parsePhrase(String line)
+    {   // returns the phrase if line is a phrase
+        // returns an empty string otherwise
+        if(line.length()==0)
+        {
+            return "";
+        }
+        else if(line.charAt(0)=='-')
+        {
+            return line.substring(1,line.length()).trim();
+
+        }
+        else
+        {
+            return "";
+        }
+    }
+    private void addPhraseToMap(String phrase,String category)
+    {
+        if(!phrases.containsKey(category))
+        {
+            phrases.put(category,new ArrayList());
+        }
+        List categoryPhrases=(List)phrases.get(category);
+        categoryPhrases.add(phrase);
+    }
+    private void readPhrasesFromFile()
+    {
+        try
+        {
+            BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME));
+            String line;
+            String currentCategory="DEFAULT";
+            while((line=input.readLine())!=null)
+            {
+                line=line.trim();
+                String categoryMarker=parseCategoryMarker(line);
+                if(categoryMarker.length()>0)
+                {
+                    currentCategory=categoryMarker;
+                }
+                else
+                {
+                    String phrase=parsePhrase(line);
+                    if(phrase.length()>0)
+                    {
+                        addPhraseToMap(phrase,currentCategory);
+                    }
+                }
+            }
+            input.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private PlayerScore parseScore(String line)
+    {
+        line=line.trim();
+        String[] parts=line.split("\\s*,\\s*");
+        if(parts.length!=2)
+        {
+            return null;
+        }
+        else
+        {
+            return new PlayerScore(parts[0],Integer.parseInt(parts[1]));
+        }
+    }
+
+    private void readScoresFromFile()
+    {
+        try
+        {
+            BufferedReader input=new BufferedReader(new FileReader(SCORE_FILE_NAME));
+            String line;
+            String currentCategory="DEFAULT";
+            while((line=input.readLine())!=null)
+            {
+                PlayerScore score=parseScore(line);
+                if(score!=null)
+                {
+                    playerScores.add(score);
+                }
+            }
+            Collections.sort(playerScores,Collections.reverseOrder());
+            input.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeScoresToFile()
+    {
+        try
+        {
+            PrintWriter output=new PrintWriter(new FileWriter(SCORE_FILE_NAME));
+            for(int i=0;i<playerScores.size();++i)
+            {
+                PlayerScore playerScore=(PlayerScore)playerScores.get(i);
+                output.println(playerScore.playerName+","+playerScore.score);
+            }
+            output.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayHighScores() // only here for TESTING
+    {
+        for(int i=0;i<playerScores.size();++i)
+        {
+            console.println(playerScores.get(i).toString());
+        }
+    }
+
+    private void displayPhrases() // only here for TESTING
+    {
+        Set phraseCategories=phrases.keySet();
+        Iterator it=phraseCategories.iterator();
+        while(it.hasNext())
+        {
+            String categoryName=(String)it.next();
+
+            console.println("CURRENT CATEGORY: "+categoryName);
+            List phrasesInCategory=(List)phrases.get(categoryName);
+            for(int i=0;i<phrasesInCategory.size() && i<3;++i)
+            {
+                console.println((String)phrasesInCategory.get(i));
+            }
+            console.println();
+        }
+    }
+
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
+        /*
         char[][] chardata = new char[6][24];
         chardata[2][2] = 'A';
         chardata[2][3] = 'B';
@@ -191,6 +374,12 @@ public class WheelOfFortune {
         game.drawButton(100, 500, "Button", 'X', false);
         game.drawButton(400, 500, "Action", 'Y', true);
         game.drawHost(600, 600);
+        */
+
+        game.displayHighScores();
+        game.displayPhrases();
+
+        game.writeScoresToFile();
         /*
             while (game.newRound()) {    
                 game.newRound();
@@ -202,3 +391,4 @@ public class WheelOfFortune {
         */
     }
 }
+
