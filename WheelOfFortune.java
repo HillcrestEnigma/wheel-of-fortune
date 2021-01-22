@@ -50,16 +50,31 @@ public class WheelOfFortune {
         } 
     }
     private Console console;
-    public final int CONSOLE_WIDTH=1024;
-    public final int CONSOLE_HEIGHT=768;
+    public static final int CONSOLE_WIDTH=1024;
+    public static final int CONSOLE_HEIGHT=768;
+    public static final int FONT_SIZE=20;
 
-    public final String PHRASE_FILE_NAME="phrases.wof_data";
-    public final String SCORE_FILE_NAME="scores.wof";
+    public static final int CHAT_BOX_X=CONSOLE_WIDTH/20;
+    public static final int CHAT_BOX_Y=CONSOLE_WIDTH/2;
+    public static final int CHAT_BOX_WIDTH=CONSOLE_WIDTH/2;
+    public static final int CHAT_BOX_HEIGHT=CONSOLE_WIDTH/5;
+
+    public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
+
+    public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
+
+    public final int INTERACTION_AREA_ROW;
+    public final int INTERACTION_AREA_COL;
+
+    public static final int PLAYER_NAME_MAX_LEN=10;
+
+    public static final String PHRASE_FILE_NAME="phrases.wof_data";
+    public static final String SCORE_FILE_NAME="scores.wof";
 
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
 
-    private final int[] WHEEL_VALUES={
+    private static final int[] WHEEL_VALUES={
         LOSE_TURN,2500,700,600,550,
         BANKRUPT,600,550,500,800,
         LOSE_TURN,800,500,900,500};
@@ -71,7 +86,7 @@ public class WheelOfFortune {
     public WheelOfFortune() {
         // create a test console to calculate number of pixels per row and column
         int pxPerRow,pxPerCol;
-        Console tmpConsole = new Console(1,1);
+        Console tmpConsole = new Console(1,1,FONT_SIZE);
         pxPerRow=tmpConsole.getHeight();
         pxPerCol=tmpConsole.getWidth();
         tmpConsole.close();
@@ -79,7 +94,10 @@ public class WheelOfFortune {
         int consoleRows=CONSOLE_HEIGHT/pxPerRow;
         int consoleCols=CONSOLE_WIDTH/pxPerCol;
 
-        console=new Console(consoleRows,consoleCols);
+        INTERACTION_AREA_ROW=INTERACTION_AREA_Y/pxPerRow+1;
+        INTERACTION_AREA_COL=1;
+
+        console=new Console(consoleRows,consoleCols,FONT_SIZE);
 
         phrases=new HashMap();
         playerScores=new ArrayList();
@@ -199,6 +217,12 @@ public class WheelOfFortune {
         console.setFont(new Font("Arial", Font.PLAIN, 20));
         console.drawString(action, (int)(x+16), (int)(y+33));
         console.drawString("" + key, (int)(x+168), (int)(y+33));
+    }
+
+    private void drawInteractionArea()
+    {
+        console.setColor(Color.LIGHT_GRAY);
+        console.fillRect(0,INTERACTION_AREA_Y,SIDEBAR_X,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
     }
 
     private void drawHost(int x, int y) {
@@ -363,8 +387,52 @@ public class WheelOfFortune {
         }
     }
 
+    public String formatDialog(String speaker,String message)
+    {
+        return speaker+": "+message;
+    }
+
+    public String acceptString(String prompt,int lengthLimit)
+    {
+        while(true)
+        {
+            drawInteractionArea();
+            console.setCursor(INTERACTION_AREA_ROW,INTERACTION_AREA_COL);
+            console.print(prompt);
+            String answer=console.readLine();
+            if(answer.length()>lengthLimit)
+            {
+                console.println("The string which you entered was too long! Please try again.\nPress any key to continue ...");
+                console.getChar();
+                continue;
+            }
+            else
+            {
+                return answer;
+            }
+        }
+    }
+
+    public boolean newRound()
+    {
+//        drawBackground();
+        List chatBoxLines=new ArrayList();
+        chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        String player1Name=acceptString("What is the name of player 1? ",PLAYER_NAME_MAX_LEN);
+        chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I am excited to win some money!"));
+
+
+        chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        String player2Name=acceptString("What is the name of player 2? ",PLAYER_NAME_MAX_LEN);
+        chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I know I will win!"));
+        chatBoxLines.add(formatDialog("Host","You surely sound confident!"));
+        return false;
+    }
+
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
+        while(game.newRound());
+//        game.goodbye();
         /*
         char[][] chardata = new char[6][24];
         chardata[2][2] = 'A';
@@ -375,11 +443,12 @@ public class WheelOfFortune {
         game.drawButton(400, 500, "Action", 'Y', true);
         game.drawHost(600, 600);
         */
-
+/*
         game.displayHighScores();
         game.displayPhrases();
 
         game.writeScoresToFile();
+        */
         /*
             while (game.newRound()) {    
                 game.newRound();
