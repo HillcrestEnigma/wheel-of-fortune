@@ -13,6 +13,7 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import hsa.Console;
+import hsa.Message;
 import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -437,6 +438,19 @@ public class WheelOfFortune {
         }
     }
 
+    public char acceptChar(char[] available) {
+        char input = console.getChar();
+        for (int i=0; i<available.length; i++) if (input == available[i]) return input;
+        new Message("Please enter a valid option.");
+        return acceptChar(available);
+    }
+
+    public char acceptMenuChoice(char[] available) {
+        char input = console.getChar();
+        for (int i=0; i<available.length; i++) if (input == available[i]) return input;
+        return acceptChar(available);
+    }
+
     public boolean newRound()
     {
 //        drawBackground();
@@ -461,6 +475,8 @@ public class WheelOfFortune {
         lines[1] = "Donald: Hello";
         lines[2] = "Margaret: Bye";
         game.drawChatBox(lines, 100, 100);
+        char[] character = {'a', 'b', 'c', 'd', 'e'};
+        game.console.println(game.acceptChar(character));
         // game.goodbye();
         /*
         char[][] chardata = new char[6][24];
