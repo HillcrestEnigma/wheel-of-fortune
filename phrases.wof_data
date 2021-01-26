@@ -1,14 +1,14 @@
 OpenSource:
-- angularjs
+- angular.js
 - grafana
 - go
-- node
+- node.js
 - linux
 - keras
 - rust
-- nextjs
+- next.js
 - pandas
-- react router
+- react-router
 - Ghost
 - syncthing
 - kotlin
@@ -22,12 +22,12 @@ OpenSource:
 - moby
 - jest
 - uBlock
-- react native
+- react-native
 - godot
 - brew
 - TypeScript
 - tensorflow
-- ohmyzsh
+- oh my zsh
 - shadowsocks
 - vscode
 - swift
@@ -39,12 +39,12 @@ OpenSource:
 - express
 - pytorch
 - websocket
-- springboot
-- socketio
+- spring-boot
+- socket.io
 - opencv
 - hugo
 - hyper
-- nuxtjs
+- nuxt.js
 - bulma
 - javascript
 - rclone
@@ -54,13 +54,13 @@ OpenSource:
 - vue
 - atom
 - element
-- pihole
+- pi-hole
 - webpack
 - svelte
 - kubernetes
 - flutter
-- RocketChat
-- SemanticUI
+- Rocket.Chat
+- Semantic-UI
 - laravel
 - puppeteer
 - fetch
@@ -203,7 +203,7 @@ ICS:
 - Return Method
 - Recursion
 - Errortrapping
-- Try Catch Statement
+- Try-Catch Statement
 - Casting
 - Boolean
 - Character
