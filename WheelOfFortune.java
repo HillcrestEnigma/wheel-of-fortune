@@ -231,6 +231,30 @@ public class WheelOfFortune {
         console.fillRect(x+5, y+45, 40, 100);
     }
 
+    private void drawPlayerInfo(int x, int y, String name, int balance, boolean current_turn, boolean is_winner) {
+        console.setColor(Color.black);
+        console.drawRect(x, y, 200, 50);
+        if (current_turn) console.setColor(new Color(255, 102, 102));
+        else if (is_winner) console.setColor(new Color(204, 255, 204));
+        else console.setColor(new Color(255, 204, 204));
+        console.fillRect(x+1, y+1, 199, 49);
+        console.setColor(Color.black);
+        console.setFont(new Font("Arial", Font.PLAIN, 20));
+        console.drawString(name + " - " + balance, (int)(x+16), (int)(y+33));
+    }
+
+    private void drawChatBox(String[] lines, int x, int y) {
+        console.setColor(Color.black);
+        console.drawRect(x, y, 500, 200);
+        console.setColor(new Color(255, 255, 204));
+        console.fillRect(x+1, y+1, 499, 199);
+        console.setColor(Color.black);
+        console.setFont(new Font("Arial", Font.PLAIN, 16));
+        for (int i = 0; i<lines.length; i++) {
+            console.drawString(lines[i], x+16, y+20 + i*20);
+        }
+    }
+
     private String parseCategoryMarker(String line)
     {   // returns the category name if line is a category marker
         // returns an empty string otherwise
@@ -431,8 +455,13 @@ public class WheelOfFortune {
 
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
-        while(game.newRound());
-//        game.goodbye();
+        // while(game.newRound());
+        String[] lines = new String[3];
+        lines[0] = "Joseph: Hello";
+        lines[1] = "Donald: Hello";
+        lines[2] = "Margaret: Bye";
+        game.drawChatBox(lines, 100, 100);
+        // game.goodbye();
         /*
         char[][] chardata = new char[6][24];
         chardata[2][2] = 'A';
@@ -443,7 +472,7 @@ public class WheelOfFortune {
         game.drawButton(400, 500, "Action", 'Y', true);
         game.drawHost(600, 600);
         */
-/*
+        /*
         game.displayHighScores();
         game.displayPhrases();
 
