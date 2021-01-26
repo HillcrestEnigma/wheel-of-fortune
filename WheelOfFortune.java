@@ -23,34 +23,38 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
 
-public class WheelOfFortune {
-    class PlayerScore implements Comparable
+class PlayerScore implements Comparable
+{
+    public final String playerName;
+    public final int score;
+    public PlayerScore(String pn,int sc)
     {
-        public final String playerName;
-        public final int score;
-        public PlayerScore(String pn,int sc)
-        {
-            score=sc;
-            playerName=pn;
-        }
-        public int compareTo(Object o)
-        {
-            PlayerScore other=(PlayerScore)o;
-            if(score==other.score)
-            {
-                return playerName.compareTo(other.playerName);
-            }
-            else
-            {
-                return new Integer(score).compareTo(new Integer(other.score));
-            }
-        }
-        public String toString() // only here for TESTING
-        {
-            return playerName+" -> "+score;
-        } 
+        score=sc;
+        playerName=pn;
     }
+    public int compareTo(Object o)
+    {
+        PlayerScore other=(PlayerScore)o;
+        if(score==other.score)
+        {
+            return playerName.compareTo(other.playerName);
+        }
+        else
+        {
+            return new Integer(score).compareTo(new Integer(other.score));
+        }
+    }
+    public String toString() // only here for TESTING
+    {
+        return playerName+" -> "+score;
+    } 
+}
+
+public class WheelOfFortune {
     private Console console;
+
+    public static final int NUMBER_OF_SPINS=10;
+
     public static final int CONSOLE_WIDTH=1024;
     public static final int CONSOLE_HEIGHT=768;
     public static final int FONT_SIZE=20;
@@ -71,6 +75,8 @@ public class WheelOfFortune {
 
     public static final String PHRASE_FILE_NAME="phrases.wof_data";
     public static final String SCORE_FILE_NAME="scores.wof";
+
+    public static final String HOST_NAME="scores.wof";
 
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
@@ -182,8 +188,6 @@ public class WheelOfFortune {
             Color.BLACK,Color.CYAN,Color.GREEN,Color.RED,Color.PINK
         };
         
-        final int SLICES=WHEEL_VALUES.length;
-
         BufferedImage bufferedImage=new BufferedImage(radius*2,radius*2,BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics=(Graphics2D)bufferedImage.getGraphics();
         drawWheelBaseToGraphics(graphics,WHEEL_COLORS, radius, angle);
@@ -218,12 +222,6 @@ public class WheelOfFortune {
         console.setFont(new Font("Arial", Font.PLAIN, 20));
         console.drawString(action, (int)(x+16), (int)(y+33));
         console.drawString("" + key, (int)(x+168), (int)(y+33));
-    }
-
-    private void drawInteractionArea()
-    {
-        console.setColor(Color.LIGHT_GRAY);
-        console.fillRect(0,INTERACTION_AREA_Y,SIDEBAR_X,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
     }
 
     private void drawHost(int x, int y) {
@@ -417,13 +415,22 @@ public class WheelOfFortune {
         return speaker+": "+message;
     }
 
+    public void drawInteractionArea()
+    {
+        console.setColor(Color.LIGHT_GRAY);
+        console.fillRect(0,INTERACTION_AREA_Y,SIDEBAR_X,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
+    }
+    public void drawToInteractionArea(String str)
+    {
+        drawInteractionArea();
+        console.setCursor(INTERACTION_AREA_ROW,INTERACTION_AREA_COL);
+        console.print(str);
+    }
     public String acceptString(String prompt,int lengthLimit)
     {
         while(true)
         {
-            drawInteractionArea();
-            console.setCursor(INTERACTION_AREA_ROW,INTERACTION_AREA_COL);
-            console.print(prompt);
+            drawToInteractionArea(prompt);
             String answer=console.readLine();
             if(answer.length()>lengthLimit)
             {
@@ -455,15 +462,35 @@ public class WheelOfFortune {
     {
 //        drawBackground();
         List chatBoxLines=new ArrayList();
-        chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        chatBoxLines.add(formatDialog(HOST_NAME,"Hey what's your name?"));
         String player1Name=acceptString("What is the name of player 1? ",PLAYER_NAME_MAX_LEN);
         chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I am excited to win some money!"));
 
-
-        chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        chatBoxLines.add(formatDialog(HOST_NAME,"Hey what's your name?"));
         String player2Name=acceptString("What is the name of player 2? ",PLAYER_NAME_MAX_LEN);
         chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I know I will win!"));
-        chatBoxLines.add(formatDialog("Host","You surely sound confident!"));
+        chatBoxLines.add(formatDialog(HOST_NAME,"You surely sound confident!"));
+
+        boolean player1Turn=true;
+        for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
+        {
+            String currentPlayerName,otherPlayerName;
+            if(player1Turn)
+            {
+                currentPlayerName=player1Name;
+                otherPlayerName=player2Name;
+            }
+            else
+            {
+                currentPlayerName=player2Name;
+                otherPlayerName=player1Name;
+            }
+            chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"!"));
+            drawToInteractionArea("The wheel is spinning.");
+
+            
+
+        }
         return false;
     }
 
