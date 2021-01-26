@@ -243,6 +243,18 @@ public class WheelOfFortune {
         console.drawString(name + " - " + balance, (int)(x+16), (int)(y+33));
     }
 
+    private void drawChatBox(String[] lines, int x, int y) {
+        console.setColor(Color.black);
+        console.drawRect(x, y, 500, 200);
+        console.setColor(new Color(255, 255, 204));
+        console.fillRect(x+1, y+1, 499, 199);
+        console.setColor(Color.black);
+        console.setFont(new Font("Arial", Font.PLAIN, 16));
+        for (int i = 0; i<lines.length; i++) {
+            console.drawString(lines[i], x+16, y+20 + i*20);
+        }
+    }
+
     private String parseCategoryMarker(String line)
     {   // returns the category name if line is a category marker
         // returns an empty string otherwise
@@ -443,7 +455,12 @@ public class WheelOfFortune {
 
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
-        while(game.newRound());
+        // while(game.newRound());
+        String[] lines = new String[3];
+        lines[0] = "Joseph: Hello";
+        lines[1] = "Donald: Hello";
+        lines[2] = "Margaret: Bye";
+        game.drawChatBox(lines, 100, 100);
         // game.goodbye();
         /*
         char[][] chardata = new char[6][24];
