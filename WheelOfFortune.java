@@ -55,12 +55,17 @@ public class WheelOfFortune {
     public static final int CONSOLE_HEIGHT=768;
     public static final int FONT_SIZE=20;
 
-    public static final int CHAT_BOX_X=CONSOLE_WIDTH/20;
-    public static final int CHAT_BOX_Y=CONSOLE_WIDTH/2;
-    public static final int CHAT_BOX_WIDTH=CONSOLE_WIDTH/2;
-    public static final int CHAT_BOX_HEIGHT=CONSOLE_WIDTH/5;
+    public static final int LETTER_GRID_X = 10;
+    public static final int LETTER_GRID_Y = 10;
+    public static final int LETTER_GRID_CELL_SIZE = 30;
 
     public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
+
+    public static final int CHAT_BOX_WIDTH=CONSOLE_WIDTH/2;
+    public static final int CHAT_BOX_HEIGHT=CONSOLE_WIDTH/5;
+    public static final int CHAT_BOX_X=10;
+    public static final int CHAT_BOX_Y=INTERACTION_AREA_Y-CHAT_BOX_HEIGHT-10;
+    public static final int CHAT_BOX_MAX_LINES=5;
 
     public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
 
@@ -192,7 +197,10 @@ public class WheelOfFortune {
         console.drawImage(bufferedImage,x-radius,y-radius,null);
     }
 
-    private void drawLetterGrid(int x, int y, int squareSize, char[][] grid) {
+    private void drawLetterGrid(char[][] grid) {
+        int x = LETTER_GRID_X;
+        int y = LETTER_GRID_Y;
+        int squareSize = LETTER_GRID_CELL_SIZE;
         console.setFont(new Font("Arial", Font.PLAIN, 15));
         Color emptyColor = new Color(153, 204, 255);
         Color filledColor = new Color(242, 242, 242);
@@ -232,6 +240,11 @@ public class WheelOfFortune {
         console.fillRect(x+5, y+45, 40, 100);
     }
 
+    private void drawHostPlatform(int x, int y) {
+        console.setColor(Color.gray);
+        console.fillOval(x-25, y+120, 100, 50);
+    }
+
     private void drawPlayerInfo(int x, int y, String name, int balance, boolean current_turn, boolean is_winner) {
         console.setColor(Color.black);
         console.drawRect(x, y, 200, 50);
@@ -244,15 +257,15 @@ public class WheelOfFortune {
         console.drawString(name + " - " + balance, (int)(x+16), (int)(y+33));
     }
 
-    private void drawChatBox(String[] lines, int x, int y) {
+    private void drawChatBox(List<String> lines) {
         console.setColor(Color.black);
-        console.drawRect(x, y, 500, 200);
+        console.drawRect(CHAT_BOX_X, CHAT_BOX_Y, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
         console.setColor(new Color(255, 255, 204));
-        console.fillRect(x+1, y+1, 499, 199);
+        console.fillRect(CHAT_BOX_X+1, CHAT_BOX_Y+1, CHAT_BOX_WIDTH-1, CHAT_BOX_HEIGHT-1);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 16));
-        for (int i = 0; i<lines.length; i++) {
-            console.drawString(lines[i], x+16, y+20 + i*20);
+        for (int i = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES); i<lines.size(); i++) {
+            console.drawString(lines.get(i), CHAT_BOX_X+16, CHAT_BOX_Y+20 + i*20);
         }
     }
 
@@ -422,7 +435,7 @@ public class WheelOfFortune {
         while(true)
         {
             drawInteractionArea();
-            console.setCursor(INTERACTION_AREA_ROW,INTERACTION_AREA_COL);
+            console.setCursor(INTERACTION_AREA_ROW+1,INTERACTION_AREA_COL+1);
             console.print(prompt);
             String answer=console.readLine();
             if(answer.length()>lengthLimit)
@@ -445,7 +458,7 @@ public class WheelOfFortune {
         return acceptChar(available);
     }
 
-    public char acceptMenuChoice(String prompt, String[] choices) {
+    public int acceptMenuChoice(String prompt, String[] choices) {
         console.clear();
         console.setFont(new Font("Arial", Font.PLAIN, 15));
         console.println(prompt);
@@ -454,36 +467,45 @@ public class WheelOfFortune {
         }
         char[] availableLetters = new char[choices.length];
         for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
-        return acceptChar(availableLetters);
+        return (int)(acceptChar(availableLetters)-'1');
     }
 
     public boolean newRound()
     {
-        
+        Set<String> phraseCategoriesSet = phrases.keySet();
+        String[] phraseCategories = new String[phraseCategoriesSet.size()];
+        phraseCategoriesSet.toArray(phraseCategories);
 
-        List chatBoxLines=new ArrayList();
+        int categoryIdx = acceptMenuChoice("Please choose a category of phrases to play with.", phraseCategories);
+        String category = phraseCategories[categoryIdx];
+        console.clear();
+
+        char[][] grid = new char[8][25];
+        drawLetterGrid(grid);
+
+        drawHostPlatform(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
+        drawHost(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
+
+        List chatBoxLines=new ArrayList<String>();
         chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        drawChatBox(chatBoxLines);
         String player1Name=acceptString("What is the name of player 1? ",PLAYER_NAME_MAX_LEN);
         chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I am excited to win some money!"));
-
+        drawChatBox(chatBoxLines);
 
         chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
+        drawChatBox(chatBoxLines);
         String player2Name=acceptString("What is the name of player 2? ",PLAYER_NAME_MAX_LEN);
-        chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I know I will win!"));
+        chatBoxLines.add(formatDialog(player2Name,"I'm "+player2Name+" and I know I will win!"));
         chatBoxLines.add(formatDialog("Host","You surely sound confident!"));
+        drawChatBox(chatBoxLines);
         return false;
     }
 
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
+        game.newRound();
         // while(game.newRound());
-        String[] lines = new String[5];
-        lines[0] = "Menu Item 1";
-        lines[1] = "Menu Item 2";
-        lines[2] = "Menu Item 3";
-        lines[3] = "Menu Item 4";
-        lines[4] = "Menu Item 5";
-        game.console.println(game.acceptMenuChoice("Choose an item.", lines));
         // game.goodbye();
         /*
         char[][] chardata = new char[6][24];
