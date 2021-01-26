@@ -445,15 +445,22 @@ public class WheelOfFortune {
         return acceptChar(available);
     }
 
-    public char acceptMenuChoice(char[] available) {
-        char input = console.getChar();
-        for (int i=0; i<available.length; i++) if (input == available[i]) return input;
-        return acceptChar(available);
+    public char acceptMenuChoice(String prompt, String[] choices) {
+        console.clear();
+        console.setFont(new Font("Arial", Font.PLAIN, 15));
+        console.println(prompt);
+        for (int i=0; i<choices.length; i++) {
+            drawButton(50 + (i%3)*250, 300 + (i/3)*100, choices[i], (char)(i+'1'), false);
+        }
+        char[] availableLetters = new char[choices.length];
+        for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
+        return acceptChar(availableLetters);
     }
 
     public boolean newRound()
     {
-//        drawBackground();
+        
+
         List chatBoxLines=new ArrayList();
         chatBoxLines.add(formatDialog("Host","Hey what's your name?"));
         String player1Name=acceptString("What is the name of player 1? ",PLAYER_NAME_MAX_LEN);
@@ -470,13 +477,13 @@ public class WheelOfFortune {
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
         // while(game.newRound());
-        String[] lines = new String[3];
-        lines[0] = "Joseph: Hello";
-        lines[1] = "Donald: Hello";
-        lines[2] = "Margaret: Bye";
-        game.drawChatBox(lines, 100, 100);
-        char[] character = {'a', 'b', 'c', 'd', 'e'};
-        game.console.println(game.acceptChar(character));
+        String[] lines = new String[5];
+        lines[0] = "Menu Item 1";
+        lines[1] = "Menu Item 2";
+        lines[2] = "Menu Item 3";
+        lines[3] = "Menu Item 4";
+        lines[4] = "Menu Item 5";
+        game.console.println(game.acceptMenuChoice("Choose an item.", lines));
         // game.goodbye();
         /*
         char[][] chardata = new char[6][24];
