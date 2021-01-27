@@ -1,9 +1,9 @@
 # wheel-of-fortune
 
 ## Building
-Requires **JDK version between 1.4 and 8**, since source value 1.4 was removed in JDK 9.
+Requires JDK version 1.4 or greater.
 ```bash
-javac WheelOfFortune.java -source 1.4
+javac WheelOfFortune.java
 ```
 
 ## Usage
