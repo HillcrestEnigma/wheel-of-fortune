@@ -233,6 +233,35 @@ public class WheelOfFortune {
         }
     }
 
+    private char[][] stringToCharacterGrid(String str,int rows,int cols)
+    {
+        char[][] grid=new char[rows][cols];
+        String[] words=str.split(" ");
+        int currentRow=0,currentCol=0;
+        for(int i=0;i<words.length;++i)
+        {
+            String currentWord=words[i].toUpperCase();
+            while(currentRow<rows)
+            {
+                if(cols-currentCol >= currentWord.length())
+                {
+                    for(int j=0;j<currentWord.length();++j)
+                    {
+                        grid[currentRow][currentCol+j]=currentWord.charAt(j);
+                    }
+                    currentCol+=currentWord.length()+1;
+                    break;
+                }
+                else
+                {
+                    ++currentRow;
+                    currentCol=0;
+                }
+            }
+        }
+        return grid;
+    }
+
     private void drawSidebarHeading(int x, int y, String heading) {
         console.setColor(Color.black);
         console.drawRect(x, y, SIDEBAR_WIDTH, 50);
@@ -594,6 +623,7 @@ public class WheelOfFortune {
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
         game.newRound();
+
         // while(game.newRound());
         // game.goodbye();
         /*
