@@ -215,6 +215,16 @@ public class WheelOfFortune {
         }
     }
 
+    private void drawMenuHeading(int x, int y, String ) {
+        console.setColor(Color.black);
+        console.drawRect(x, y, 200, 50);
+        console.setColor(new Color(255, 153, 102));
+        console.fillRect(x+1, y+1, 199, 49);
+        console.setColor(Color.black);
+        console.setFont(new Font("Arial", Font.PLAIN, 20));
+        console.drawString(action, (int)(x+16), (int)(y+33));
+    }
+
     private void drawButton(int x, int y, String action, char key, boolean activated) {
         console.setColor(Color.black);
         console.drawRect(x, y, 200, 50);
