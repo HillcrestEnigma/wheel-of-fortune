@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 
 class PlayerScore implements Comparable
 {
@@ -52,6 +54,7 @@ class PlayerScore implements Comparable
 
 public class WheelOfFortune {
     private Console console;
+    private Random rng;
 
     public static final int NUMBER_OF_SPINS=10;
 
@@ -62,6 +65,8 @@ public class WheelOfFortune {
     public static final int LETTER_GRID_X = 10;
     public static final int LETTER_GRID_Y = 10;
     public static final int LETTER_GRID_CELL_SIZE = 30;
+    public static final int LETTER_GRID_ROWS = 8;
+    public static final int LETTER_GRID_COLS = 25;
 
     public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
 
@@ -128,6 +133,8 @@ public class WheelOfFortune {
 
         phrases=new HashMap();
         playerScores=new ArrayList();
+
+        rng=new Random();
         
         readPhrasesFromFile();
         readScoresFromFile();
@@ -581,8 +588,9 @@ public class WheelOfFortune {
         String category = phraseCategories[categoryIdx];
         console.clear();
 
-        char[][] grid = new char[8][25];
-        drawLetterGrid(grid);
+
+
+        drawLetterGrid(new char[LETTER_GRID_ROWS][LETTER_GRID_COLS]);
 
         drawHostPlatform(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
         drawHost(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
@@ -607,6 +615,33 @@ public class WheelOfFortune {
         chatBoxLines.add(formatDialog(player2Name,"I'm "+player2Name+" and I know I will win!"));
         chatBoxLines.add(formatDialog(HOST_NAME,"You surely sound confident!"));
 	drawChatBox(chatBoxLines);
+
+        List phrasesInCategory=(List)phrases.get(category);
+        int phraseIndex=rng.nextInt(phrasesInCategory.size());
+        String phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
+        char[] currentlyGuessed=new char[phrase.length()];
+        for(int i=0;i<phrase.length();++i)
+        {
+            char c=phrase.charAt(i);
+            if(Character.isLetter(c))
+            {
+                currentlyGuessed[i]=' ';
+            }
+            else if(Character.isSpaceChar(c))
+            {
+                currentlyGuessed[i]='\0';
+            }
+            else
+            {
+                currentlyGuessed[i]=c;
+            }
+        }
+
+        Set availableLetters=new HashSet();
+        for(char c='A';c<='Z';++c)
+        {
+            availableLetters.add(new Character(c));
+        }
 
         boolean player1Turn=true;
         double angle = 0;
@@ -673,6 +708,51 @@ public class WheelOfFortune {
             chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue + "? That's pretty nice."));
             chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
             drawChatBox(chatBoxLines);
+
+            char guess;
+            while(true)
+            {
+                guess=Character.toUpperCase(console.getChar());
+                if(availableLetters.contains(new Character(guess)))
+                {
+                    break;
+                }
+                else
+                {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "That has been guessed already bruhhh"));
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Since I'm a nice person, I'll let you try again."));
+                    drawChatBox(chatBoxLines);
+                    guess=console.getChar();
+                }
+            }
+            availableLetters.remove(new Character(guess));
+
+            int occurences=0;
+            for(int i=0;i<currentlyGuessed.length;++i)
+            {
+                if(phrase.charAt(i)==guess)
+                {
+                    ++occurences;
+                    currentlyGuessed[i]=guess;
+                }
+            }
+
+            String guessResult;
+            if(occurences==0) guessResult="are no";
+            else if(occurences==1) guessResult="is 1";
+            else guessResult="are "+occurences;
+            chatBoxLines.add(formatDialog(HOST_NAME, "There "+guessResult+" "+guess+"'s!"));
+            drawChatBox(chatBoxLines);
+
+            player1Turn=!player1Turn;
+            
+            drawLetterGrid(
+                stringToCharacterGrid(
+                    new String(currentlyGuessed),
+                    LETTER_GRID_ROWS,
+                    LETTER_GRID_COLS
+                )
+            );
 
             pauseProgram();
 
