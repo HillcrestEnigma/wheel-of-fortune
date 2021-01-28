@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Random;
 
 class PlayerScore implements Comparable
 {
@@ -52,6 +53,7 @@ class PlayerScore implements Comparable
 
 public class WheelOfFortune {
     private Console console;
+    private Random rng;
 
     public static final int NUMBER_OF_SPINS=10;
 
@@ -62,6 +64,8 @@ public class WheelOfFortune {
     public static final int LETTER_GRID_X = 10;
     public static final int LETTER_GRID_Y = 10;
     public static final int LETTER_GRID_CELL_SIZE = 30;
+    public static final int LETTER_GRID_ROWS = 8;
+    public static final int LETTER_GRID_COLS = 25;
 
     public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
 
@@ -126,6 +130,8 @@ public class WheelOfFortune {
 
         phrases=new HashMap();
         playerScores=new ArrayList();
+
+        rng=new Random();
         
         readPhrasesFromFile();
         readScoresFromFile();
@@ -561,8 +567,9 @@ public class WheelOfFortune {
         String category = phraseCategories[categoryIdx];
         console.clear();
 
-        char[][] grid = new char[8][25];
-        drawLetterGrid(grid);
+
+
+        drawLetterGrid(new char[LETTER_GRID_ROWS][LETTER_GRID_COLS]);
 
         drawHostPlatform(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
         drawHost(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
@@ -589,11 +596,42 @@ public class WheelOfFortune {
 
         drawSidebar();
 
+        List phrasesInCategory=(List)phrases.get(category);
+        int phraseIndex=rng.nextInt(phrasesInCategory.size());
+        String phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
+        char[] currentlyGuessed=new char[phrase.length()];
+        for(int i=0;i<phrase.length();++i)
+        {
+            char c=phrase.charAt(i);
+            if(Character.isLetter(c))
+            {
+                currentlyGuessed[i]=' ';
+            }
+            else if(Character.isSpaceChar(c))
+            {
+                currentlyGuessed[i]='\0';
+            }
+            else
+            {
+                currentlyGuessed[i]=c;
+            }
+        }
+
+//        Set av
+
         boolean player1Turn=true;
         double angle = 0;
         double vel;
         for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
         {
+            drawLetterGrid(
+                stringToCharacterGrid(
+                    new String(currentlyGuessed),
+                    LETTER_GRID_ROWS,
+                    LETTER_GRID_COLS
+                )
+            );
+
             String currentPlayerName,otherPlayerName;
             if(player1Turn)
             {
