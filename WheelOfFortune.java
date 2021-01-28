@@ -69,7 +69,7 @@ public class WheelOfFortune {
     public static final int CHAT_BOX_HEIGHT=CONSOLE_HEIGHT/4;
     public static final int CHAT_BOX_X=10;
     public static final int CHAT_BOX_Y=INTERACTION_AREA_Y-CHAT_BOX_HEIGHT-10;
-    public static final int CHAT_BOX_MAX_LINES=5;
+    public static final int CHAT_BOX_MAX_LINES=9;
 
     public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
     public static final int SIDEBAR_WIDTH=CONSOLE_WIDTH/4;
@@ -94,10 +94,15 @@ public class WheelOfFortune {
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
 
+    // private static final int[] WHEEL_VALUES={
+    //     LOSE_TURN,2500,700,600,550,
+    //     BANKRUPT,600,550,500,800,
+    //     LOSE_TURN,800,500,900,500};
+
     private static final int[] WHEEL_VALUES={
-        LOSE_TURN,2500,700,600,550,
-        BANKRUPT,600,550,500,800,
-        LOSE_TURN,800,500,900,500};
+        1,2,3,4,5,
+        6,7,8,9,10,
+        11,12,13,14,15};
 
     private Map phrases;
     private List playerScores;
@@ -315,8 +320,9 @@ public class WheelOfFortune {
         console.fillRect(CHAT_BOX_X+1, CHAT_BOX_Y+1, CHAT_BOX_WIDTH-1, CHAT_BOX_HEIGHT-1);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 16));
-        for (int i = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES); i<lines.size(); i++) {
-            console.drawString((String)lines.get(i), CHAT_BOX_X+16, CHAT_BOX_Y+20 + i*20);
+        int topMessage = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES);
+        for (int i = 0; i<Math.min(CHAT_BOX_MAX_LINES, lines.size()); i++) {
+            console.drawString((String)lines.get(i + topMessage), CHAT_BOX_X+16, CHAT_BOX_Y+20 + (i)*20);
         }
     }
 
@@ -325,7 +331,9 @@ public class WheelOfFortune {
         console.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, CONSOLE_HEIGHT);
 
         drawSidebarHeading(WHEEL_X-WHEEL_RADIUS, WHEEL_Y-WHEEL_RADIUS-50, "Wheel");
-        drawWheel(30);
+        drawWheel(0);
+        console.setColor(new Color(100, 100, 100));
+        console.fillOval(WHEEL_X - WHEEL_RADIUS*13/16, WHEEL_Y - WHEEL_RADIUS*13/16, 10, 10);
     }
 
     private String parseCategoryMarker(String line)
@@ -538,6 +546,11 @@ public class WheelOfFortune {
         return (int)(acceptChar(availableLetters)-'1');
     }
 
+    public void pauseProgram() {
+        drawToInteractionArea("Press any key to continue.");
+        console.getChar();
+    }
+
     public boolean newRound()
     {
         Set phraseCategoriesSet = phrases.keySet();
@@ -577,6 +590,8 @@ public class WheelOfFortune {
         drawSidebar();
 
         boolean player1Turn=true;
+        double angle = 0;
+        double vel;
         for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
         {
             String currentPlayerName,otherPlayerName;
@@ -590,11 +605,14 @@ public class WheelOfFortune {
                 currentPlayerName=player2Name;
                 otherPlayerName=player1Name;
             }
-            chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"!"));
-            drawToInteractionArea("The wheel is spinning.");
 
-            for (int i=20; i>0; i--) {
-                drawWheel(Math.PI/180.0*i);
+            drawToInteractionArea("The wheel is spinning.");
+            chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"!"));
+            drawChatBox(chatBoxLines);
+
+            for (int i=0; i<20; i++) {
+                angle += Math.PI/180.0;
+                drawWheel(angle);
                 try {
                     Thread.sleep(1);
                 } catch (Exception e) {}
@@ -602,20 +620,38 @@ public class WheelOfFortune {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {}
-            double vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
-            double angle = 0;
+            vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
             while (vel > 0) {
                 drawWheel(angle);
-                angle += vel/100.0;
+                angle -= vel/100.0;
                 vel += WHEEL_ACCEL/100.0;
                 try {
                     Thread.sleep(10);
                 } catch (Exception e) {}
             }
 
-            int wheelIdx = (int)((angle+Math.PI/4)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length);
+            int letterValue = WHEEL_VALUES[(int)((Math.PI*13/24-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
 
-            break;
+            if (letterValue == LOSE_TURN) {
+                chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
+                chatBoxLines.add(formatDialog(currentPlayerName, "Whoops!"));
+                drawChatBox(chatBoxLines);
+                pauseProgram();
+                continue;
+            } else if (letterValue == BANKRUPT) {
+                chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have lost all of the money you've accumulated."));
+                chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
+                drawChatBox(chatBoxLines);
+                pauseProgram();
+                continue;
+            }
+
+            chatBoxLines.add(formatDialog(HOST_NAME, "Let's see..."));
+            chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue + "? That's pretty nice."));
+            chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
+            drawChatBox(chatBoxLines);
+
+            pauseProgram();
         }
         return false;
     }
