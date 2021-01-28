@@ -73,16 +73,23 @@ public class WheelOfFortune {
 
     public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
     public static final int SIDEBAR_WIDTH=CONSOLE_WIDTH/4;
+    public static final int SIDEBAR_ITEM_HEIGHT = 50;
 
     public final int INTERACTION_AREA_ROW;
     public final int INTERACTION_AREA_COL;
 
     public static final int WHEEL_X=SIDEBAR_X+SIDEBAR_WIDTH;
-    public static final int WHEEL_Y=CONSOLE_HEIGHT;
+    public static final int WHEEL_Y=0;
     public static final int WHEEL_RADIUS=SIDEBAR_WIDTH;
     public static final double WHEEL_INIT_VEL_LOWER_BOUND=Math.PI*3;
     public static final double WHEEL_INIT_VEL_UPPER_BOUND=Math.PI*7;
     public static final double WHEEL_ACCEL=-Math.PI*4/3;
+
+    public static final int PLAYER_LIST_X = SIDEBAR_X;
+    public static final int PLAYER_LIST_Y = CONSOLE_HEIGHT-SIDEBAR_WIDTH-(int)(SIDEBAR_ITEM_HEIGHT*4.5);
+
+    public static final int CATEGORY_INDICATOR_X = SIDEBAR_X;
+    public static final int CATEGORY_INDICATOR_Y = PLAYER_LIST_Y+(int)(SIDEBAR_ITEM_HEIGHT*3.5);
 
     public static final int PLAYER_NAME_MAX_LEN=10;
 
@@ -262,15 +269,7 @@ public class WheelOfFortune {
         return grid;
     }
 
-    private void drawSidebarHeading(int x, int y, String heading) {
-        console.setColor(Color.black);
-        console.drawRect(x, y, SIDEBAR_WIDTH, 50);
-        console.setColor(new Color(255, 153, 102));
-        console.fillRect(x+1, y+1, SIDEBAR_WIDTH-1, 49);
-        console.setColor(Color.black);
-        console.setFont(new Font("Arial", Font.PLAIN, 20));
-        console.drawString(heading, (int)(x+16), (int)(y+33));
-    }
+    
 
     private void drawButton(int x, int y, String action, char key, boolean activated) {
         console.setColor(Color.black);
@@ -296,16 +295,36 @@ public class WheelOfFortune {
         console.fillOval(x-25, y+120, 100, 50);
     }
 
-    private void drawPlayerInfo(int x, int y, String name, int balance, boolean current_turn, boolean is_winner) {
+    
+
+    private void drawGenericSidebarWidget(int x, int y, String text, Color color) {
         console.setColor(Color.black);
-        console.drawRect(x, y, 200, 50);
-        if (current_turn) console.setColor(new Color(255, 102, 102));
-        else if (is_winner) console.setColor(new Color(204, 255, 204));
-        else console.setColor(new Color(255, 204, 204));
-        console.fillRect(x+1, y+1, 199, 49);
+        console.drawRect(x, y, SIDEBAR_WIDTH, SIDEBAR_ITEM_HEIGHT);
+        console.setColor(color);
+        console.fillRect(x+1, y+1, SIDEBAR_WIDTH-1, SIDEBAR_ITEM_HEIGHT-1);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 20));
-        console.drawString(name + " - " + balance, (int)(x+16), (int)(y+33));
+        console.drawString(text, (int)(x+16), (int)(y+SIDEBAR_ITEM_HEIGHT*33/50.0));
+    }
+
+    private void drawGenericSidebarWidget(int x, int y, String text) {
+        drawGenericSidebarWidget(x, y, text, new Color(255, 204, 204));
+    }
+
+    private void drawSidebarHeading(int x, int y, String text) {
+        drawGenericSidebarWidget(x, y, text, new Color(255, 153, 102));
+    }
+
+    private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn, boolean isWinner) {
+        Color color;
+        if (currentTurn) color = new Color(255, 204, 102);
+        else if (isWinner) color = new Color(204, 255, 204);
+        else color = new Color(255, 204, 204);
+        drawGenericSidebarWidget(PLAYER_LIST_X, PLAYER_LIST_Y + SIDEBAR_ITEM_HEIGHT*playerID, name + " - $" + balance, color);
+    }
+
+    private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn) {
+        drawPlayerInfo(playerID, name, balance, currentTurn, false);
     }
 
     private void drawChatBox(List lines) {
@@ -323,12 +342,18 @@ public class WheelOfFortune {
 
     private void drawSidebar() {
         console.setColor(new Color(255, 102, 102));
-        console.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, CONSOLE_HEIGHT);
+        console.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, INTERACTION_AREA_Y);
 
-        drawSidebarHeading(WHEEL_X-WHEEL_RADIUS, WHEEL_Y-WHEEL_RADIUS-50, "Wheel");
+        drawSidebarHeading(PLAYER_LIST_X, PLAYER_LIST_Y, "Players");
+        drawPlayerInfo(1, "???", 0, false, false);
+        drawPlayerInfo(2, "???", 0, false, false);
+
+        drawSidebarHeading(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y, "Category");
+        drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, "???");
+
         drawWheel(0);
         console.setColor(new Color(100, 100, 100));
-        console.fillOval(WHEEL_X - WHEEL_RADIUS*13/16, WHEEL_Y - WHEEL_RADIUS*13/16, 10, 10);
+        console.fillOval(WHEEL_X - WHEEL_RADIUS*13/16, WHEEL_Y + WHEEL_RADIUS*13/16, 10, 10);
     }
 
     private String parseCategoryMarker(String line)
@@ -495,7 +520,7 @@ public class WheelOfFortune {
     public void drawInteractionArea()
     {
         console.setColor(Color.LIGHT_GRAY);
-        console.fillRect(0,INTERACTION_AREA_Y,SIDEBAR_X,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
+        console.fillRect(0,INTERACTION_AREA_Y,CONSOLE_WIDTH,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
     }
     public void drawToInteractionArea(String str)
     {
@@ -563,33 +588,36 @@ public class WheelOfFortune {
         drawHost(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
 
         drawSidebar();
-
-        
+        drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category);
 
         List chatBoxLines=new ArrayList();
         chatBoxLines.add(formatDialog(HOST_NAME,"Hey what's your name?"));
         drawChatBox(chatBoxLines);
         String player1Name=acceptString("What is the name of player 1? ",PLAYER_NAME_MAX_LEN);
+        int player1Balance = 0;
+        drawPlayerInfo(1, player1Name, player1Balance, false);
         chatBoxLines.add(formatDialog(player1Name,"I'm "+player1Name+" and I am excited to win some money!"));
         drawChatBox(chatBoxLines);
 
-        drawSidebar();
 
         chatBoxLines.add(formatDialog(HOST_NAME,"Hey what's your name?"));
         drawChatBox(chatBoxLines);
         String player2Name=acceptString("What is the name of player 2? ",PLAYER_NAME_MAX_LEN);
+        int player2Balance = 0;
         chatBoxLines.add(formatDialog(player2Name,"I'm "+player2Name+" and I know I will win!"));
         chatBoxLines.add(formatDialog(HOST_NAME,"You surely sound confident!"));
 	drawChatBox(chatBoxLines);
 
-        drawSidebar();
-
         boolean player1Turn=true;
         double angle = 0;
         double vel;
+        String currentPlayerName,otherPlayerName;
+
         for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
         {
-            String currentPlayerName,otherPlayerName;
+            drawPlayerInfo(1, player1Name, player1Balance, player1Turn);
+            drawPlayerInfo(2, player2Name, player2Balance, !player1Turn);
+
             if(player1Turn)
             {
                 currentPlayerName=player1Name;
@@ -625,7 +653,7 @@ public class WheelOfFortune {
                 } catch (Exception e) {}
             }
 
-            int letterValue = WHEEL_VALUES[(int)((Math.PI*27/48-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
+            int letterValue = WHEEL_VALUES[(int)((Math.PI/15-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
 
             if (letterValue == LOSE_TURN) {
                 chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
@@ -634,7 +662,7 @@ public class WheelOfFortune {
                 pauseProgram();
                 continue;
             } else if (letterValue == BANKRUPT) {
-                chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have lost all of the money you've accumulated."));
+                chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have just bankrupted."));
                 chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
                 drawChatBox(chatBoxLines);
                 pauseProgram();
@@ -647,6 +675,8 @@ public class WheelOfFortune {
             drawChatBox(chatBoxLines);
 
             pauseProgram();
+
+            player1Turn = !player1Turn;
         }
         return false;
     }
