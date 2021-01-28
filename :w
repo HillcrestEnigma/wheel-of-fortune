@@ -624,6 +624,14 @@ public class WheelOfFortune {
         double vel;
         for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
         {
+            drawLetterGrid(
+                stringToCharacterGrid(
+                    new String(currentlyGuessed),
+                    LETTER_GRID_ROWS,
+                    LETTER_GRID_COLS
+                )
+            );
+
             String currentPlayerName,otherPlayerName;
             if(player1Turn)
             {
@@ -685,7 +693,7 @@ public class WheelOfFortune {
             while(true)
             {
                 guess=Character.toUpperCase(console.getChar());
-                if(availableLetters.contains(new Character(guess)))
+                if(availableLetters.contains(guess))
                 {
                     break;
                 }
@@ -697,7 +705,7 @@ public class WheelOfFortune {
                     guess=console.getChar();
                 }
             }
-            availableLetters.remove(new Character(guess));
+            availableLetters.remove(guess);
 
             int occurences=0;
             for(int i=0;i<currentlyGuessed.length;++i)
@@ -718,14 +726,6 @@ public class WheelOfFortune {
 
             player1Turn=!player1Turn;
             
-            drawLetterGrid(
-                stringToCharacterGrid(
-                    new String(currentlyGuessed),
-                    LETTER_GRID_ROWS,
-                    LETTER_GRID_COLS
-                )
-            );
-
             pauseProgram();
         }
         return false;
