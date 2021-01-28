@@ -94,15 +94,10 @@ public class WheelOfFortune {
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
 
-    // private static final int[] WHEEL_VALUES={
-    //     LOSE_TURN,2500,700,600,550,
-    //     BANKRUPT,600,550,500,800,
-    //     LOSE_TURN,800,500,900,500};
-
     private static final int[] WHEEL_VALUES={
-        1,2,3,4,5,
-        6,7,8,9,10,
-        11,12,13,14,15};
+        LOSE_TURN,2500,700,600,550,
+        BANKRUPT,600,550,500,800,
+        LOSE_TURN,800,500,900,500};
 
     private Map phrases;
     private List playerScores;
@@ -630,7 +625,7 @@ public class WheelOfFortune {
                 } catch (Exception e) {}
             }
 
-            int letterValue = WHEEL_VALUES[(int)((Math.PI*13/24-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
+            int letterValue = WHEEL_VALUES[(int)((Math.PI*27/48-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
 
             if (letterValue == LOSE_TURN) {
                 chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
