@@ -88,7 +88,7 @@ public class WheelOfFortune {
     public static final int WHEEL_RADIUS=SIDEBAR_WIDTH;
     public static final double WHEEL_INIT_VEL_LOWER_BOUND=Math.PI*3;
     public static final double WHEEL_INIT_VEL_UPPER_BOUND=Math.PI*7;
-    public static final double WHEEL_ACCEL=-Math.PI*4/3;
+    public static final double WHEEL_ACCEL=-Math.PI*5/3;
 
     public static final int PLAYER_LIST_X = SIDEBAR_X;
     public static final int PLAYER_LIST_Y = CONSOLE_HEIGHT-SIDEBAR_WIDTH-(int)(SIDEBAR_ITEM_HEIGHT*4.5);
@@ -240,6 +240,7 @@ public class WheelOfFortune {
             for (int j=0; j<grid.length; j++) {
                 if (grid[j][i] != 0) console.setColor(filledColor);
                 else console.setColor(emptyColor);
+                if (grid[j][i] == '_') grid[j][i] = ' ';
                 console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1);
                 console.setColor(Color.black);
                 console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65)));
@@ -617,39 +618,58 @@ public class WheelOfFortune {
 	drawChatBox(chatBoxLines);
 
         List phrasesInCategory=(List)phrases.get(category);
-        int phraseIndex=rng.nextInt(phrasesInCategory.size());
-        String phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
-        char[] currentlyGuessed=new char[phrase.length()];
-        for(int i=0;i<phrase.length();++i)
-        {
-            char c=phrase.charAt(i);
-            if(Character.isLetter(c))
-            {
-                currentlyGuessed[i]=' ';
-            }
-            else if(Character.isSpaceChar(c))
-            {
-                currentlyGuessed[i]='\0';
-            }
-            else
-            {
-                currentlyGuessed[i]=c;
-            }
-        }
-
+        int phraseIndex = -1;
+        String phrase = "";
+        char[] currentlyGuessed = new char[0];
         Set availableLetters=new HashSet();
-        for(char c='A';c<='Z';++c)
-        {
-            availableLetters.add(new Character(c));
-        }
+        boolean newPhrase = true;
 
         boolean player1Turn=true;
         double angle = 0;
         double vel;
+        int letterProfit;
         String currentPlayerName,otherPlayerName;
 
         for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
         {
+            if (newPhrase) {
+                phraseIndex=rng.nextInt(phrasesInCategory.size());
+                phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
+                currentlyGuessed=new char[phrase.length()];
+                for(int i=0;i<phrase.length();++i)
+                {
+                    char c=phrase.charAt(i);
+                    if(Character.isLetter(c))
+                    {
+                        currentlyGuessed[i]='_';
+                    }
+                    else if(Character.isSpaceChar(c))
+                    {
+                        currentlyGuessed[i]=0;
+                    }
+                    else
+                    {
+                        currentlyGuessed[i]=c;
+                    }
+                }
+
+                availableLetters=new HashSet();
+                for(char c='A';c<='Z';++c)
+                {
+                    availableLetters.add(new Character(c));
+                }
+
+                drawLetterGrid(
+                    stringToCharacterGrid(
+                        new String(currentlyGuessed),
+                        LETTER_GRID_ROWS,
+                        LETTER_GRID_COLS
+                    )
+                );
+
+                newPhrase = false;
+            }
+
             drawPlayerInfo(1, player1Name, player1Balance, player1Turn);
             drawPlayerInfo(2, player2Name, player2Balance, !player1Turn);
 
@@ -664,95 +684,115 @@ public class WheelOfFortune {
                 otherPlayerName=player1Name;
             }
 
-            drawToInteractionArea("The wheel is spinning.");
-            chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"!"));
-            drawChatBox(chatBoxLines);
-
-            for (int i=0; i<20; i++) {
-                angle += Math.PI/180.0;
-                drawWheel(angle);
-                try {
-                    Thread.sleep(1);
-                } catch (Exception e) {}
-            }
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {}
-            vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
-            while (vel > 0) {
-                drawWheel(angle);
-                angle -= vel/100.0;
-                vel += WHEEL_ACCEL/100.0;
-                try {
-                    Thread.sleep(10);
-                } catch (Exception e) {}
-            }
-
-            int letterValue = WHEEL_VALUES[(int)((Math.PI/15-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
-
-            if (letterValue == LOSE_TURN) {
-                chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
-                chatBoxLines.add(formatDialog(currentPlayerName, "Whoops!"));
+            chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"."));
+            while (true) {
+                chatBoxLines.add(formatDialog(HOST_NAME,"Go spin the wheel!"));
+                chatBoxLines.add(formatDialog(currentPlayerName,"Alright!"));
                 drawChatBox(chatBoxLines);
-                pauseProgram();
-                continue;
-            } else if (letterValue == BANKRUPT) {
-                chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have just bankrupted."));
-                chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
-                drawChatBox(chatBoxLines);
-                pauseProgram();
-                continue;
-            }
+                drawToInteractionArea("The wheel is spinning.");
 
-            chatBoxLines.add(formatDialog(HOST_NAME, "Let's see..."));
-            chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue + "? That's pretty nice."));
-            chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
-            drawChatBox(chatBoxLines);
+                for (int i=0; i<20; i++) {
+                    angle += Math.PI/180.0;
+                    drawWheel(angle);
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {}
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {}
+                vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
+                while (vel > 0) {
+                    drawWheel(angle);
+                    angle -= vel/100.0;
+                    vel += WHEEL_ACCEL/100.0;
+                    try {
+                        Thread.sleep(10);
+                    } catch (Exception e) {}
+                }
 
-            char guess;
-            while(true)
-            {
-                guess=Character.toUpperCase(console.getChar());
-                if(availableLetters.contains(new Character(guess)))
-                {
+                int letterValue = WHEEL_VALUES[(int)((Math.PI/15-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
+
+                if (letterValue == LOSE_TURN) {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
+                    chatBoxLines.add(formatDialog(currentPlayerName, "Whoops!"));
+                    drawChatBox(chatBoxLines);
+                    break;
+                } else if (letterValue == BANKRUPT) {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have just bankrupted."));
+                    chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
+                    drawChatBox(chatBoxLines);
+                    if (player1Turn) {
+                        player1Balance = 0;
+                        drawPlayerInfo(1, player1Name, player1Balance, true);
+                    } else {
+                        player2Balance = 0;
+                        drawPlayerInfo(2, player2Name, player2Balance, true);
+                    }
                     break;
                 }
-                else
+
+                chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue));
+                chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
+                drawToInteractionArea("Please enter the letter you think is in the word/phrase.");
+                drawChatBox(chatBoxLines);
+
+                char guess;
+                while(true)
                 {
-                    chatBoxLines.add(formatDialog(HOST_NAME, "That has been guessed already bruhhh"));
-                    chatBoxLines.add(formatDialog(HOST_NAME, "Since I'm a nice person, I'll let you try again."));
-                    drawChatBox(chatBoxLines);
-                    guess=console.getChar();
+                    guess=Character.toUpperCase(console.getChar());
+                    if(availableLetters.contains(new Character(guess)))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        chatBoxLines.add(formatDialog(HOST_NAME, "That has been guessed already bruhhh"));
+                        chatBoxLines.add(formatDialog(HOST_NAME, "Since I'm a nice person, I'll let you try again."));
+                        drawChatBox(chatBoxLines);
+                        guess=console.getChar();
+                    }
                 }
-            }
-            availableLetters.remove(new Character(guess));
+                availableLetters.remove(new Character(guess));
 
-            int occurences=0;
-            for(int i=0;i<currentlyGuessed.length;++i)
-            {
-                if(phrase.charAt(i)==guess)
+                int occurences=0;
+                for(int i=0;i<currentlyGuessed.length;++i)
                 {
-                    ++occurences;
-                    currentlyGuessed[i]=guess;
+                    if(phrase.charAt(i)==guess)
+                    {
+                        ++occurences;
+                        currentlyGuessed[i]=guess;
+                    }
                 }
+
+                String guessResult;
+                if(occurences==0) guessResult="are no";
+                else if(occurences==1) guessResult="is 1";
+                else guessResult="are "+occurences;
+                chatBoxLines.add(formatDialog(HOST_NAME, "There "+guessResult+" "+guess+"'s!"));
+                drawChatBox(chatBoxLines);
+
+                drawLetterGrid(
+                    stringToCharacterGrid(
+                        new String(currentlyGuessed),
+                        LETTER_GRID_ROWS,
+                        LETTER_GRID_COLS
+                    )
+                );
+
+                if (occurences == 0) break;
+
+                letterProfit = occurences * letterValue;
+                if (player1Turn) {
+                    player1Balance += letterProfit;
+                    drawPlayerInfo(1, player1Name, player1Balance, true);
+                } else {
+                    player2Balance += letterProfit;
+                    drawPlayerInfo(2, player2Name, player2Balance, true);
+                }
+
+                pauseProgram();
             }
-
-            String guessResult;
-            if(occurences==0) guessResult="are no";
-            else if(occurences==1) guessResult="is 1";
-            else guessResult="are "+occurences;
-            chatBoxLines.add(formatDialog(HOST_NAME, "There "+guessResult+" "+guess+"'s!"));
-            drawChatBox(chatBoxLines);
-
-            player1Turn=!player1Turn;
-            
-            drawLetterGrid(
-                stringToCharacterGrid(
-                    new String(currentlyGuessed),
-                    LETTER_GRID_ROWS,
-                    LETTER_GRID_COLS
-                )
-            );
 
             pauseProgram();
 
@@ -765,18 +805,6 @@ public class WheelOfFortune {
         WheelOfFortune game = new WheelOfFortune();
         game.newRound();
 
-        // while(game.newRound());
-        // game.goodbye();
-        /*
-        char[][] chardata = new char[6][24];
-        chardata[2][2] = 'A';
-        chardata[2][3] = 'B';
-        chardata[2][4] = 'C';
-        game.drawLetterGrid(10, 10, 30, chardata);
-        game.drawButton(100, 500, "Button", 'X', false);
-        game.drawButton(400, 500, "Action", 'Y', true);
-        game.drawHost(600, 600);
-        */
         /*
         game.displayHighScores();
         game.displayPhrases();
