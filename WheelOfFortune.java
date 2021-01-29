@@ -46,10 +46,17 @@ class PlayerScore implements Comparable
             return new Integer(score).compareTo(new Integer(other.score));
         }
     }
-    public String toString() // only here for TESTING
-    {
-        return playerName+" -> "+score;
-    } 
+}
+
+class Phrase {
+    public final String text;
+    public final String category;
+    public final String type;
+    public Phrase(String ph, String ct, String tp) {
+        text=ph.toUpperCase();
+        category=ct;
+        type=tp;
+    }
 }
 
 public class WheelOfFortune {
@@ -411,7 +418,7 @@ public class WheelOfFortune {
         {
             return "";
         }
-        else if(line.charAt(line.length()-1)==':')
+        else if(!line.startsWith("- ") && line.charAt(line.length()-1)==':')
         {
             return line.substring(0,line.length()-1);
         }
@@ -420,16 +427,17 @@ public class WheelOfFortune {
             return "";
         }
     }
-    private String parsePhrase(String line)
+
+    private String parseTypeMarker(String line)
     {   // returns the phrase if line is a phrase
         // returns an empty string otherwise
         if(line.length()==0)
         {
             return "";
         }
-        else if(line.charAt(0)=='-')
+        else if(line.startsWith("- ") && line.charAt(line.length()-1) == ':')
         {
-            return line.substring(1,line.length()).trim();
+            return line.substring(2,line.length()-1).trim();
 
         }
         else
@@ -437,15 +445,35 @@ public class WheelOfFortune {
             return "";
         }
     }
-    private void addPhraseToMap(String phrase,String category)
+
+    private String parsePhrase(String line)
+    {   // returns the phrase if line is a phrase
+        // returns an empty string otherwise
+        if(line.length()==0)
+        {
+            return "";
+        }
+        else if(line.startsWith("- "))
+        {
+            return line.substring(2,line.length()).trim();
+
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    private void addPhraseToMap(String phrase,String category,String type)
     {
         if(!phrases.containsKey(category))
         {
             phrases.put(category,new ArrayList());
         }
         List categoryPhrases=(List)phrases.get(category);
-        categoryPhrases.add(phrase);
+        categoryPhrases.add(new Phrase(phrase, category, type));
     }
+    
     private void readPhrasesFromFile()
     {
         try
@@ -453,20 +481,25 @@ public class WheelOfFortune {
             BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME));
             String line;
             String currentCategory="DEFAULT";
+            String currentType="DEFAULT";
             while((line=input.readLine())!=null)
             {
                 line=line.trim();
                 String categoryMarker=parseCategoryMarker(line);
+                String typeMarker=parseTypeMarker(line);
                 if(categoryMarker.length()>0)
                 {
                     currentCategory=categoryMarker;
                 }
-                else
+                else if (typeMarker.length()>0)
                 {
+                    currentType=typeMarker;
+                }
+                else {
                     String phrase=parsePhrase(line);
                     if(phrase.length()>0)
                     {
-                        addPhraseToMap(phrase,currentCategory);
+                        addPhraseToMap(phrase,currentCategory,currentType);
                     }
                 }
             }
@@ -670,7 +703,7 @@ public class WheelOfFortune {
 
         List phrasesInCategory=(List)phrases.get(category);
         int phraseIndex = -1;
-        String phrase = "";
+        Phrase phrase = new Phrase("", "", "");
         char[] currentlyGuessed = new char[0];
         Set availableLetters=new HashSet();
         boolean newPhrase = true;
@@ -688,12 +721,12 @@ public class WheelOfFortune {
         {
             if (newPhrase) {
                 phraseIndex=rng.nextInt(phrasesInCategory.size());
-                phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
-                System.out.println(phrase);
-                currentlyGuessed=new char[phrase.length()];
-                for(int i=0;i<phrase.length();++i)
+                phrase=(Phrase)(phrasesInCategory.get(phraseIndex));
+                System.out.println(phrase.text);
+                currentlyGuessed=new char[phrase.text.length()];
+                for(int i=0;i<phrase.text.length();++i)
                 {
-                    char c=phrase.charAt(i);
+                    char c=phrase.text.charAt(i);
                     if(Character.isLetter(c))
                     {
                         currentlyGuessed[i]='_';
@@ -724,7 +757,10 @@ public class WheelOfFortune {
 
                 newPhrase = false;
                 
+                drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category + " / " + phrase.type);
+
                 chatBoxLines.add(formatDialog(HOST_NAME, "New phrase!"));
+                chatBoxLines.add(formatDialog(HOST_NAME, "This one is a " + phrase.type + "."));
                 drawChatBox(chatBoxLines);
             }
 
@@ -745,57 +781,61 @@ public class WheelOfFortune {
             chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"."));
             drawChatBox(chatBoxLines);
             PLAYER_TURN: while (true) {
+
+                chatBoxLines.add(formatDialog(HOST_NAME,"Go spin the wheel!"));
+                chatBoxLines.add(formatDialog(currentPlayerName,"Alright!"));
+                drawChatBox(chatBoxLines);
+                drawToInteractionArea("The wheel is spinning.");
+
+                for (int i=0; i<20; i++) {
+                    angle += Math.PI/180.0;
+                    drawWheel(angle);
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {}
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {}
+                vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
+                while (vel > 0) {
+                    drawWheel(angle);
+                    angle -= vel/100.0;
+                    vel += WHEEL_ACCEL/100.0;
+                    try {
+                        Thread.sleep(10);
+                    } catch (Exception e) {}
+                }
+
+                int letterValue = WHEEL_VALUES[(int)((Math.PI/15-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
+
+                if (letterValue == LOSE_TURN) {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
+                    chatBoxLines.add(formatDialog(currentPlayerName, "Whoops!"));
+                    drawChatBox(chatBoxLines);
+                    break;
+                } else if (letterValue == BANKRUPT) {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have just bankrupted."));
+                    chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
+                    drawChatBox(chatBoxLines);
+                    if (player1Turn) {
+                        player1Balance = 0;
+                        drawPlayerInfo(1, player1Name, player1Balance, true);
+                    } else {
+                        player2Balance = 0;
+                        drawPlayerInfo(2, player2Name, player2Balance, true);
+                    }
+                    break;
+                }
+
+                chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue));
+                drawChatBox(chatBoxLines);
+
                 playerAction = acceptChoice("What would you like to do?", playerTurnChoices);
                 if (playerAction == 0) {
-                    chatBoxLines.add(formatDialog(HOST_NAME,"Go spin the wheel!"));
-                    chatBoxLines.add(formatDialog(currentPlayerName,"Alright!"));
-                    drawChatBox(chatBoxLines);
-                    drawToInteractionArea("The wheel is spinning.");
-
-                    for (int i=0; i<20; i++) {
-                        angle += Math.PI/180.0;
-                        drawWheel(angle);
-                        try {
-                            Thread.sleep(1);
-                        } catch (Exception e) {}
-                    }
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception e) {}
-                    vel = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
-                    while (vel > 0) {
-                        drawWheel(angle);
-                        angle -= vel/100.0;
-                        vel += WHEEL_ACCEL/100.0;
-                        try {
-                            Thread.sleep(10);
-                        } catch (Exception e) {}
-                    }
-
-                    int letterValue = WHEEL_VALUES[(int)((Math.PI/15-angle)%(Math.PI*2)/(Math.PI*2)*WHEEL_VALUES.length)];
-
-                    if (letterValue == LOSE_TURN) {
-                        chatBoxLines.add(formatDialog(HOST_NAME, "Sorry, " + currentPlayerName + ". Looks like you lose a turn this time."));
-                        chatBoxLines.add(formatDialog(currentPlayerName, "Whoops!"));
-                        drawChatBox(chatBoxLines);
-                        break;
-                    } else if (letterValue == BANKRUPT) {
-                        chatBoxLines.add(formatDialog(HOST_NAME, "Oh NO! " + currentPlayerName + ", you have just bankrupted."));
-                        chatBoxLines.add(formatDialog(currentPlayerName, "NOOOOOOOOO!"));
-                        drawChatBox(chatBoxLines);
-                        if (player1Turn) {
-                            player1Balance = 0;
-                            drawPlayerInfo(1, player1Name, player1Balance, true);
-                        } else {
-                            player2Balance = 0;
-                            drawPlayerInfo(2, player2Name, player2Balance, true);
-                        }
-                        break;
-                    }
-
-                    chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue));
+                    
                     chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
-                    drawToInteractionArea("Please enter the letter you think is in the word/phrase.");
+                    drawToInteractionArea("Please enter the letter you think is in the " + phrase.type + ".");
                     drawChatBox(chatBoxLines);
 
                     char guess;
@@ -823,7 +863,7 @@ public class WheelOfFortune {
                     int occurences=0;
                     for(int i=0;i<currentlyGuessed.length;++i)
                     {
-                        if(phrase.charAt(i)==guess)
+                        if(phrase.text.charAt(i)==guess)
                         {
                             ++occurences;
                             currentlyGuessed[i]=guess;
@@ -857,7 +897,7 @@ public class WheelOfFortune {
                     }
 
                     for (int i=0; i<currentlyGuessed.length; ++i) {
-                        if (currentlyGuessed[i] != phrase.charAt(i)) {
+                        if (currentlyGuessed[i] != phrase.text.charAt(i)) {
                             pauseProgram();
                             continue PLAYER_TURN;
                         }
@@ -918,7 +958,7 @@ public class WheelOfFortune {
                         break;
                     }
 
-                    if(guess.equals(phrase))
+                    if(guess.equals(phrase.text))
                     {
                         chatBoxLines.add(formatDialog(HOST_NAME, "That's right!"));
                         chatBoxLines.add(formatDialog(currentPlayerName, "Oh my gosh!"));
@@ -926,9 +966,22 @@ public class WheelOfFortune {
                         drawToInteractionArea("CORRECT.");
                         newPhrase = true;
 
+                        int numLettersMissing = 0;
                         for (int i=0; i<currentlyGuessed.length; ++i) {
-                            if (Character.isSpaceChar(phrase.charAt(i))) currentlyGuessed[i] = '\0';
-                            else currentlyGuessed[i] = phrase.charAt(i);
+                            if (Character.isSpaceChar(phrase.text.charAt(i))) currentlyGuessed[i] = '\0';
+                            else {
+                                currentlyGuessed[i] = phrase.text.charAt(i);
+                                numLettersMissing++;
+                            }
+                        }
+
+                        letterProfit = numLettersMissing * letterValue;
+                        if (player1Turn) {
+                            player1Balance += letterProfit;
+                            drawPlayerInfo(1, player1Name, player1Balance, true);
+                        } else {
+                            player2Balance += letterProfit;
+                            drawPlayerInfo(2, player2Name, player2Balance, true);
                         }
 
                         drawLetterGrid(
