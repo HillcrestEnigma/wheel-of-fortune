@@ -56,7 +56,7 @@ public class WheelOfFortune {
     private Console console;
     private Random rng;
 
-    public static final int NUMBER_OF_SPINS=10;
+    public static final int NUMBER_OF_PHRASES=10;
 
     public static final int CONSOLE_WIDTH=1024;
     public static final int CONSOLE_HEIGHT=768;
@@ -88,7 +88,7 @@ public class WheelOfFortune {
     public static final int WHEEL_RADIUS=SIDEBAR_WIDTH;
     public static final double WHEEL_INIT_VEL_LOWER_BOUND=Math.PI*3;
     public static final double WHEEL_INIT_VEL_UPPER_BOUND=Math.PI*7;
-    public static final double WHEEL_ACCEL=-Math.PI*5/3;
+    public static final double WHEEL_ACCEL=-Math.PI*2;
 
     public static final int PLAYER_LIST_X = SIDEBAR_X;
     public static final int PLAYER_LIST_Y = CONSOLE_HEIGHT-SIDEBAR_WIDTH-(int)(SIDEBAR_ITEM_HEIGHT*4.5);
@@ -650,7 +650,7 @@ public class WheelOfFortune {
         int playerAction;
         String[] playerTurnChoices = {"Guess letter", "Solve puzzle"};
 
-        for(int loop=0;loop<NUMBER_OF_SPINS;++loop)
+        for(int loop=0;loop<NUMBER_OF_PHRASES;++loop)
         {
             if (newPhrase) {
                 phraseIndex=rng.nextInt(phrasesInCategory.size());
@@ -920,6 +920,37 @@ public class WheelOfFortune {
 
             player1Turn = !player1Turn;
         }
+
+        boolean player1Winner = true;
+        boolean player2Winner = true;
+        if (player1Balance > player2Balance) player2Winner = false;
+        else if (player1Balance < player2Balance) player1Winner = false;
+
+        if (player1Winner && player2Winner) {
+            drawToInteractionArea("Game is OVER. It's a TIE!");
+            chatBoxLines.add(formatDialog(HOST_NAME, "Oh my... We have a tie here!"));
+            chatBoxLines.add(formatDialog(HOST_NAME, "Contestants, please show your good sportsmanship!"));
+            chatBoxLines.add(formatDialog(player1Name, "It was a pleasure playing with you!"));
+            chatBoxLines.add(formatDialog(player2Name, "We both did amazing!"));
+            drawChatBox(chatBoxLines);
+        } else if (player1Winner) {
+            drawToInteractionArea("Game is OVER. " + player1Name + " is the winner!");
+            chatBoxLines.add(formatDialog(HOST_NAME, "Congratulations " + player1Name + ", you are the winner tonight!"));
+            chatBoxLines.add(formatDialog(player1Name, "Yayyyy!"));
+            chatBoxLines.add(formatDialog(player1Name, player2Name + ", you were an amazing player too!"));
+            chatBoxLines.add(formatDialog(player2Name, "Noo, congraultulations, " + player1Name + "!"));
+            chatBoxLines.add(formatDialog(player2Name, "You are the winner tonight!"));
+            drawChatBox(chatBoxLines);
+        } else {
+            drawToInteractionArea("Game is OVER. " + player2Name + " is the winner!");
+            chatBoxLines.add(formatDialog(HOST_NAME, "Congratulations " + player2Name + ", you won tonight!"));
+            chatBoxLines.add(formatDialog(player2Name, "Really?"));
+            chatBoxLines.add(formatDialog(player1Name, "Congraultations, " + player2Name + ", you were amazing!"));
+            chatBoxLines.add(formatDialog(player2Name, "Thanks! You were amazing too!"));
+            drawChatBox(chatBoxLines);
+        }
+        drawPlayerInfo(1, player1Name, player1Balance, false, player1Winner);
+        drawPlayerInfo(2, player2Name, player2Balance, false, player2Winner);
         return false;
     }
 
