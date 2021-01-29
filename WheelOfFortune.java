@@ -255,7 +255,7 @@ public class WheelOfFortune {
     private char[][] stringToCharacterGrid(String str,int rows,int cols)
     {
         char[][] grid=new char[rows][cols];
-        String[] words=str.split("@");
+        String[] words=str.split("\0");
         int currentRow=0,currentCol=0;
         for(int i=0;i<words.length;++i)
         {
@@ -278,6 +278,7 @@ public class WheelOfFortune {
                 }
             }
         }
+
         return grid;
     }
 
@@ -822,8 +823,6 @@ public class WheelOfFortune {
                     }
 
                     for (int i=0; i<currentlyGuessed.length; ++i) {
-                        System.out.println(currentlyGuessed[i]);
-                        System.out.println(phrase.charAt(i));
                         if (currentlyGuessed[i] != phrase.charAt(i)) {
                             pauseProgram();
                             continue PLAYER_TURN;
@@ -851,7 +850,7 @@ public class WheelOfFortune {
                         newPhrase = true;
 
                         for (int i=0; i<currentlyGuessed.length; ++i) {
-                            if (Character.isSpaceChar(phrase.charAt(i))) currentlyGuessed[i] = '@';
+                            if (Character.isSpaceChar(phrase.charAt(i))) currentlyGuessed[i] = '\0';
                             else currentlyGuessed[i] = phrase.charAt(i);
                         }
 
