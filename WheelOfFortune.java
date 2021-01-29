@@ -48,17 +48,6 @@ class PlayerScore implements Comparable
     }
 }
 
-class Phrase {
-    public final String text;
-    public final String category;
-    public final String type;
-    public Phrase(String ph, String ct, String tp) {
-        text=ph.toUpperCase();
-        category=ct;
-        type=tp;
-    }
-}
-
 public class WheelOfFortune {
     private Console console;
 
@@ -125,6 +114,7 @@ public class WheelOfFortune {
         LOSE_TURN,800,500,900,500};
 
     private Map phrases;
+    private Map phraseTypes;
     private List playerScores;
 
     // Class Constructor
@@ -146,6 +136,7 @@ public class WheelOfFortune {
 
         phrases=new HashMap();
         playerScores=new ArrayList();
+        phraseTypes=new HashMap();
 
         readPhrasesFromFile();
         readScoresFromFile();
@@ -468,7 +459,8 @@ public class WheelOfFortune {
             phrases.put(category,new ArrayList());
         }
         List categoryPhrases=(List)phrases.get(category);
-        categoryPhrases.add(new Phrase(phrase, category, type));
+        categoryPhrases.add(phrase);
+        phraseTypes.put(phrase, type);
     }
     
     private void readPhrasesFromFile()
@@ -701,7 +693,8 @@ public class WheelOfFortune {
         List phrasesInCategory=(List)phrases.get(category);
         Collections.shuffle(phrasesInCategory, new Random());
         int phraseIndex = 0;
-        Phrase phrase = new Phrase("", "", "");
+        String phrase = "";
+        String phraseType = "";
         char[] currentlyGuessed = new char[0];
         Set availableLetters=new HashSet();
         boolean newPhrase = true;
@@ -719,12 +712,13 @@ public class WheelOfFortune {
         {
             if (newPhrase) {
                 phraseIndex++;
-                phrase=(Phrase)(phrasesInCategory.get(phraseIndex));
-                System.out.println(phrase.text);
-                currentlyGuessed=new char[phrase.text.length()];
-                for(int i=0;i<phrase.text.length();++i)
+                phrase=(String)(phrasesInCategory.get(phraseIndex));
+                phraseType = (String)(phraseTypes.get(phrase));
+                System.out.println(phrase);
+                currentlyGuessed=new char[phrase.length()];
+                for(int i=0;i<phrase.length();++i)
                 {
-                    char c=phrase.text.charAt(i);
+                    char c=phrase.charAt(i);
                     if(Character.isLetter(c))
                     {
                         currentlyGuessed[i]='_';
@@ -755,10 +749,10 @@ public class WheelOfFortune {
 
                 newPhrase = false;
                 
-                drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category + " / " + phrase.type);
+                drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category + " / " + phraseType);
 
                 chatBoxLines.add(formatDialog(HOST_NAME, "New phrase!"));
-                chatBoxLines.add(formatDialog(HOST_NAME, "This one is a " + phrase.type + "."));
+                chatBoxLines.add(formatDialog(HOST_NAME, "This one is a " + phraseType + "."));
                 drawChatBox(chatBoxLines);
             }
 
@@ -833,7 +827,7 @@ public class WheelOfFortune {
                 if (playerAction == 0) {
                     
                     chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
-                    drawToInteractionArea("Please enter the letter you think is in the " + phrase.type + ".");
+                    drawToInteractionArea("Please enter the letter you think is in the " + phraseType + ".");
                     drawChatBox(chatBoxLines);
 
                     char guess;
@@ -861,7 +855,7 @@ public class WheelOfFortune {
                     int occurences=0;
                     for(int i=0;i<currentlyGuessed.length;++i)
                     {
-                        if(phrase.text.charAt(i)==guess)
+                        if(phrase.charAt(i)==guess)
                         {
                             ++occurences;
                             currentlyGuessed[i]=guess;
@@ -895,7 +889,7 @@ public class WheelOfFortune {
                     }
 
                     for (int i=0; i<currentlyGuessed.length; ++i) {
-                        if (currentlyGuessed[i] != phrase.text.charAt(i)) {
+                        if (currentlyGuessed[i] != phrase.charAt(i)) {
                             pauseProgram();
                             continue PLAYER_TURN;
                         }
@@ -956,7 +950,7 @@ public class WheelOfFortune {
                         break;
                     }
 
-                    if(guess.equals(phrase.text))
+                    if(guess.equals(phrase))
                     {
                         chatBoxLines.add(formatDialog(HOST_NAME, "That's right!"));
                         chatBoxLines.add(formatDialog(currentPlayerName, "Oh my gosh!"));
@@ -966,9 +960,9 @@ public class WheelOfFortune {
 
                         int numLettersMissing = 0;
                         for (int i=0; i<currentlyGuessed.length; ++i) {
-                            if (Character.isSpaceChar(phrase.text.charAt(i))) currentlyGuessed[i] = '\0';
+                            if (Character.isSpaceChar(phrase.charAt(i))) currentlyGuessed[i] = '\0';
                             else {
-                                currentlyGuessed[i] = phrase.text.charAt(i);
+                                currentlyGuessed[i] = phrase.charAt(i);
                                 numLettersMissing++;
                             }
                         }
@@ -1043,20 +1037,8 @@ public class WheelOfFortune {
         WheelOfFortune game = new WheelOfFortune();
         game.newRound();
 
-        /*
-        game.displayHighScores();
-        game.displayPhrases();
-
-        game.writeScoresToFile();
-        */
-        /*
-            while (game.newRound()) {    
-                game.newRound();
-            }
+        while (game.newRound()) {    
+            game.newRound();
         }
-        catch(UserExitException e) { // UserExitException is thrown when user wants to exit
-            game.goodbye();
-        }
-        */
     }
 }
