@@ -173,6 +173,7 @@ public class WheelOfFortune {
         }
 
     }
+
     private void drawWheelTextToGraphics(Graphics2D graphics,int radius, double angle)
     {
         graphics.rotate(angle-Math.PI*0.3,radius,radius);
@@ -251,7 +252,7 @@ public class WheelOfFortune {
     private char[][] stringToCharacterGrid(String str,int rows,int cols)
     {
         char[][] grid=new char[rows][cols];
-        String[] words=str.split(" ");
+        String[] words=str.split("@");
         int currentRow=0,currentCol=0;
         for(int i=0;i<words.length;++i)
         {
@@ -705,7 +706,7 @@ public class WheelOfFortune {
 
             chatBoxLines.add(formatDialog(HOST_NAME,"It's now your turn "+currentPlayerName+"."));
             drawChatBox(chatBoxLines);
-            while (true) {
+            PLAYER_TURN: while (true) {
                 playerAction = acceptChoice("What would you like to do?", playerTurnChoices);
                 if (playerAction == 0) {
                     chatBoxLines.add(formatDialog(HOST_NAME,"Go spin the wheel!"));
@@ -817,6 +818,19 @@ public class WheelOfFortune {
                         drawPlayerInfo(2, player2Name, player2Balance, true);
                     }
 
+                    for (int i=0; i<currentlyGuessed.length; ++i) {
+                        System.out.println(currentlyGuessed[i]);
+                        System.out.println(phrase.charAt(i));
+                        if (currentlyGuessed[i] != phrase.charAt(i)) {
+                            pauseProgram();
+                            continue PLAYER_TURN;
+                        }
+                    }
+
+                    chatBoxLines.add(formatDialog(HOST_NAME, "We got all the letters. Congratulations!"));
+                    drawChatBox(chatBoxLines);
+                    newPhrase = true;
+                    break;
                 } else {
                     chatBoxLines.add(formatDialog(currentPlayerName, "I would like to solve the puzzle!"));
                     chatBoxLines.add(formatDialog(HOST_NAME, "Yes?"));
@@ -834,7 +848,8 @@ public class WheelOfFortune {
                         newPhrase = true;
 
                         for (int i=0; i<currentlyGuessed.length; ++i) {
-                            currentlyGuessed[i] = phrase.charAt(i);
+                            if (Character.isSpaceChar(phrase.charAt(i))) currentlyGuessed[i] = '@';
+                            else currentlyGuessed[i] = phrase.charAt(i);
                         }
 
                         drawLetterGrid(
@@ -854,7 +869,6 @@ public class WheelOfFortune {
                         break;
                     }
                 }
-                pauseProgram();
             }
 
             pauseProgram();
