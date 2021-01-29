@@ -135,7 +135,7 @@ public class WheelOfFortune {
         phrases=new HashMap();
         playerScores=new ArrayList();
 
-        rng=new Random(69420);
+        rng=new Random();
         
         readPhrasesFromFile();
         readScoresFromFile();
@@ -655,6 +655,7 @@ public class WheelOfFortune {
             if (newPhrase) {
                 phraseIndex=rng.nextInt(phrasesInCategory.size());
                 phrase=((String)phrasesInCategory.get(phraseIndex)).toUpperCase();
+                System.out.println(phrase);
                 currentlyGuessed=new char[phrase.length()];
                 for(int i=0;i<phrase.length();++i)
                 {
@@ -822,8 +823,6 @@ public class WheelOfFortune {
                     }
 
                     for (int i=0; i<currentlyGuessed.length; ++i) {
-                        //System.out.println(currentlyGuessed[i]);
-                        //System.out.println(phrase.charAt(i));
                         if (currentlyGuessed[i] != phrase.charAt(i)) {
                             pauseProgram();
                             continue PLAYER_TURN;
@@ -907,8 +906,7 @@ public class WheelOfFortune {
                         );
 
                         break;
-                    }
-                    else {
+                    } else {
                         chatBoxLines.add(formatDialog(HOST_NAME, "Sorry " + currentPlayerName + ", that's not it."));
                         chatBoxLines.add(formatDialog(currentPlayerName, "Oh..."));
                         drawChatBox(chatBoxLines);
