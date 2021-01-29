@@ -152,15 +152,20 @@ public class WheelOfFortune {
     private void drawSplashScreen()
     {
         char[][] grid=new char[FS_LETTER_GRID_ROWS][FS_LETTER_GRID_COLS];
-        drawFullScreenLetterGrid(grid);
+        String text="LOADING";
+        for(int i=0;i<text.length();++i)
+        {
+            grid[5][5+i]=text.charAt(i);
+            drawFullScreenLetterGrid(grid);
         try
         {
 
-        Thread.sleep(20000);
+        Thread.sleep(200);
         }
         catch(Exception e)
         {
             e.printStackTrace();
+        }
         }
     }
 
@@ -264,7 +269,7 @@ public class WheelOfFortune {
                 FS_LETTER_GRID_CELL_SIZE);
     }
     private void drawLetterGrid(char[][] grid,int x, int y,int squareSize) {
-        console.setFont(new Font("Arial", Font.PLAIN, 15));
+        console.setFont(new Font("Arial", Font.PLAIN, squareSize/2));
         Color emptyColor = new Color(153, 204, 255);
         Color filledColor = new Color(242, 242, 242);
         for (int i=0; i<grid[0].length; i++) {
