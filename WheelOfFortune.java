@@ -105,10 +105,11 @@ public class WheelOfFortune {
 
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
+    private static final int COMMUNISM=-3;
 
     private static final int[] WHEEL_VALUES={
         LOSE_TURN,2500,700,600,550,
-        BANKRUPT,600,550,500,800,
+        BANKRUPT,600,500,COMMUNISM,800,
         LOSE_TURN,800,500,900,500};
 
     private Map phrases;
@@ -735,16 +736,20 @@ public class WheelOfFortune {
                     break;
                 }
 
-                chatBoxLines.add(formatDialog(HOST_NAME, "$" + letterValue));
-                chatBoxLines.add(formatDialog(HOST_NAME, "Now guess a letter, " + currentPlayerName + "!"));
-                drawToInteractionArea("Please enter the letter you think is in the word/phrase.");
+                chatBoxLines.add(formatDialog(HOST_NAME, "Nice one, "+currentPlayerName+", $" + letterValue+"!"));
+                chatBoxLines.add(formatDialog(HOST_NAME, "Now either guess a letter, or guess the entire phrase!"));
+                drawToInteractionArea("Please enter the letter you think is in the word/phrase.\nAlternatively, if you would like to guess the whole phrase, please enter an exclamation mark (\"!\")");
                 drawChatBox(chatBoxLines);
 
                 char guess;
                 while(true)
                 {
                     guess=Character.toUpperCase(console.getChar());
-                    if(availableLetters.contains(new Character(guess)))
+                    if(guess=='!')
+                    {
+                        break;
+                    }
+                    else if(availableLetters.contains(new Character(guess)))
                     {
                         break;
                     }
@@ -756,45 +761,96 @@ public class WheelOfFortune {
                         guess=console.getChar();
                     }
                 }
-                availableLetters.remove(new Character(guess));
-
-                int occurences=0;
-                for(int i=0;i<currentlyGuessed.length;++i)
+                if(guess=='!') // guess the phrase
                 {
-                    if(phrase.charAt(i)==guess)
+                    chatBoxLines.add(formatDialog(currentPlayerName, "I would like to guess the phrase."));
+                    chatBoxLines.add(formatDialog(HOST_NAME, "Ok! Take a shot at it."));
+                    drawChatBox(chatBoxLines);
+                    String phraseGuess=acceptString("Please enter your guess: ",Integer.MAX_VALUE);
+                    phraseGuess=phraseGuess.toUpperCase();
+                    chatBoxLines.add(formatDialog(currentPlayerName, phraseGuess));
+                    drawChatBox(chatBoxLines);
+
+                    if(phraseGuess.length()!=currentlyGuessed.length)
                     {
-                        ++occurences;
-                        currentlyGuessed[i]=guess;
+                        chatBoxLines.add(formatDialog(HOST_NAME, "That's not even the same length as the phrase!"));
+                        chatBoxLines.add(formatDialog(HOST_NAME, "What were you thinking?"));
+                        chatBoxLines.add(formatDialog(currentPlayerName, "noooooooooo"));
+                        drawChatBox(chatBoxLines);
+                        break;
+                    }
+                    boolean knownPartsMatch=true;
+                    for(int i=0;i<currentlyGuessed.length;++i)
+                    {
+                        if(currentlyGuessed[i]!='_' && currentlyGuessed[i]!=phraseGuess.charAt(i))
+                        {
+                            knownPartsMatch=false;
+                        }
+                    }
+                    if(!knownPartsMatch)
+                    {
+                        chatBoxLines.add(formatDialog(HOST_NAME, "You got the KNOWN parts of the phrase wrong!"));
+                        chatBoxLines.add(formatDialog(HOST_NAME, "What were you thinking?"));
+                        chatBoxLines.add(formatDialog(currentPlayerName, "noooooooooo"));
+                        drawChatBox(chatBoxLines);
+                        break;
+                    }
+                    if(phraseGuess.equals(phrase))
+                    {
+                        chatBoxLines.add(formatDialog(HOST_NAME, "That is correct! You're a genius!"));
+                        chatBoxLines.add(formatDialog(currentPlayerName, "YAY!!!"));
+                        drawChatBox(chatBoxLines);
+                    }
+                    else
+                    {
+                        chatBoxLines.add(formatDialog(HOST_NAME, "That is incorrect! At least you tried."));
+                        chatBoxLines.add(formatDialog(currentPlayerName, "noooooooooo"));
+                        drawChatBox(chatBoxLines);
+                        break;
                     }
                 }
+                else
+                {
+                    availableLetters.remove(new Character(guess));
 
-                String guessResult;
-                if(occurences==0) guessResult="are no";
-                else if(occurences==1) guessResult="is 1";
-                else guessResult="are "+occurences;
-                chatBoxLines.add(formatDialog(HOST_NAME, "There "+guessResult+" "+guess+"'s!"));
-                drawChatBox(chatBoxLines);
+                    int occurences=0;
+                    for(int i=0;i<currentlyGuessed.length;++i)
+                    {
+                        if(phrase.charAt(i)==guess)
+                        {
+                            ++occurences;
+                            currentlyGuessed[i]=guess;
+                        }
+                    }
 
-                drawLetterGrid(
-                    stringToCharacterGrid(
-                        new String(currentlyGuessed),
-                        LETTER_GRID_ROWS,
-                        LETTER_GRID_COLS
-                    )
-                );
+                    String guessResult;
+                    if(occurences==0) guessResult="are no";
+                    else if(occurences==1) guessResult="is 1";
+                    else guessResult="are "+occurences;
+                    chatBoxLines.add(formatDialog(HOST_NAME, "There "+guessResult+" "+guess+"'s!"));
+                    drawChatBox(chatBoxLines);
 
-                if (occurences == 0) break;
+                    drawLetterGrid(
+                        stringToCharacterGrid(
+                            new String(currentlyGuessed),
+                            LETTER_GRID_ROWS,
+                            LETTER_GRID_COLS
+                        )
+                    );
 
-                letterProfit = occurences * letterValue;
-                if (player1Turn) {
-                    player1Balance += letterProfit;
-                    drawPlayerInfo(1, player1Name, player1Balance, true);
-                } else {
-                    player2Balance += letterProfit;
-                    drawPlayerInfo(2, player2Name, player2Balance, true);
+                    if (occurences == 0) break;
+
+                    letterProfit = occurences * letterValue;
+                    if (player1Turn) {
+                        player1Balance += letterProfit;
+                        drawPlayerInfo(1, player1Name, player1Balance, true);
+                    } else {
+                        player2Balance += letterProfit;
+                        drawPlayerInfo(2, player2Name, player2Balance, true);
+                    }
+
+                    pauseProgram();
                 }
-
-                pauseProgram();
             }
 
             pauseProgram();
