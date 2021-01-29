@@ -68,6 +68,12 @@ public class WheelOfFortune {
     public static final int LETTER_GRID_ROWS = 8;
     public static final int LETTER_GRID_COLS = 25;
 
+    public static final int FS_LETTER_GRID_X = 10;
+    public static final int FS_LETTER_GRID_Y = 10;
+    public static final int FS_LETTER_GRID_CELL_SIZE = 50;
+    public static final int FS_LETTER_GRID_ROWS = 15;
+    public static final int FS_LETTER_GRID_COLS = 20;
+
     public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
 
     public static final int CHAT_BOX_WIDTH=CONSOLE_WIDTH/2;
@@ -139,6 +145,23 @@ public class WheelOfFortune {
         
         readPhrasesFromFile();
         readScoresFromFile();
+
+        drawSplashScreen();
+    }
+
+    private void drawSplashScreen()
+    {
+        char[][] grid=new char[FS_LETTER_GRID_ROWS][FS_LETTER_GRID_COLS];
+        drawFullScreenLetterGrid(grid);
+        try
+        {
+
+        Thread.sleep(20000);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void drawWheelBaseToGraphics(Graphics2D graphics,Color[] WHEEL_COLORS,int radius, double angle)
@@ -215,8 +238,6 @@ public class WheelOfFortune {
         int y = WHEEL_Y;
         int radius = WHEEL_RADIUS;
 
-        
-
         final Color[] WHEEL_COLORS={
             Color.LIGHT_GRAY,Color.ORANGE,Color.GREEN,Color.YELLOW,Color.PINK,
             Color.LIGHT_GRAY,Color.CYAN,Color.RED,Color.YELLOW,Color.ORANGE,
@@ -231,10 +252,18 @@ public class WheelOfFortune {
         console.drawImage(bufferedImage,x-radius,y-radius,null);
     }
 
-    private void drawLetterGrid(char[][] grid) {
-        int x = LETTER_GRID_X;
-        int y = LETTER_GRID_Y;
-        int squareSize = LETTER_GRID_CELL_SIZE;
+    private void drawLetterGrid(char[][] grid)
+    {
+        drawLetterGrid(grid,LETTER_GRID_X,LETTER_GRID_Y,LETTER_GRID_CELL_SIZE);
+    }
+    private void drawFullScreenLetterGrid(char[][] grid)
+    {
+        drawLetterGrid(grid,
+                FS_LETTER_GRID_X,
+                FS_LETTER_GRID_Y,
+                FS_LETTER_GRID_CELL_SIZE);
+    }
+    private void drawLetterGrid(char[][] grid,int x, int y,int squareSize) {
         console.setFont(new Font("Arial", Font.PLAIN, 15));
         Color emptyColor = new Color(153, 204, 255);
         Color filledColor = new Color(242, 242, 242);
