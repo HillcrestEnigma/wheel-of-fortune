@@ -1,215 +1,221 @@
 OpenSource:
-- angular.js
-- grafana
-- go
-- node.js
-- linux
-- keras
-- rust
-- next.js
-- pandas
-- react-router
-- Ghost
-- syncthing
-- kotlin
-- cpython
-- scrapy
-- angular
-- traefik
-- requests
-- storybook
-- axios
-- moby
-- jest
-- uBlock
-- react-native
-- godot
-- brew
-- TypeScript
-- tensorflow
-- oh my zsh
-- shadowsocks
-- vscode
-- swift
-- gogs
-- git
-- gatsby
-- electron
-- yarn
-- express
-- pytorch
-- websocket
-- spring-boot
-- socket.io
-- opencv
-- hugo
-- hyper
-- nuxt.js
-- bulma
-- javascript
-- rclone
-- neovim
-- bootstrap
-- minikube
-- vue
-- atom
-- element
-- pi-hole
-- webpack
-- svelte
-- kubernetes
-- flutter
-- Rocket.Chat
-- Semantic-UI
-- laravel
-- puppeteer
-- fetch
-- bitcoin
-- react
+- noun:
+  - angular.js
+  - grafana
+  - go
+  - node.js
+  - linux
+  - keras
+  - rust
+  - next.js
+  - pandas
+  - react-router
+  - Ghost
+  - syncthing
+  - kotlin
+  - cpython
+  - scrapy
+  - angular
+  - traefik
+  - requests
+  - storybook
+  - axios
+  - moby
+  - jest
+  - uBlock
+  - react-native
+  - godot
+  - brew
+  - TypeScript
+  - tensorflow
+  - oh my zsh
+  - shadowsocks
+  - vscode
+  - swift
+  - gogs
+  - git
+  - gatsby
+  - electron
+  - yarn
+  - express
+  - pytorch
+  - websocket
+  - spring-boot
+  - socket.io
+  - opencv
+  - hugo
+  - hyper
+  - nuxt.js
+  - bulma
+  - javascript
+  - rclone
+  - neovim
+  - bootstrap
+  - minikube
+  - vue
+  - atom
+  - element
+  - pi-hole
+  - webpack
+  - svelte
+  - kubernetes
+  - flutter
+  - Rocket.Chat
+  - Semantic-UI
+  - laravel
+  - puppeteer
+  - fetch
+  - bitcoin
+  - react
 Politcal:
-- Anarchism
-- Anarcho capitalism
-- Anarcho primitivism
-- Anarcho syndicalism
-- Anarchist communism
-- Anti communism
-- Asian values
-- Authoritarianism
-- Bioregionalism
-- Black populism
-- Bourguibism
-- Black supremacy
-- Bolivarian Revolution
-- Capitalism
-- Christian democracy
-- Christian socialism
-- Classical liberalism
-- Classical republicanism
-- Collectivism
-- Communism
-- Communitarianism
-- Conservatism
-- Corporatocracy
-- Demarchy
-- Democracy
-- Democratic peace theory
-- Democratic socialism
-- Democratic transhumanism
-- Eco-socialism
-- Egalitarianism
-- Fascism
-- Federalism
-- Fennos Paradox
-- Green anarchism
-- Green politics
-- Hindu nationalism
-- Individualist anarchism
-- Integral humanism
-- Internationalism
-- Islamism
-- Isocracy
-- Kemalism
-- Leftism
-- Left libertarianism
-- Liberalism
-- Libertarianism
-- Libertarian socialism
-- Localism
-- Majoritarianism
-- Marxism
-- Marxism Leninism
-- Marxist philosophy
-- Meritocracy
-- Minarchism
-- Minoritarianism
-- Miscegenation
-- Monarchism
-- Nationalism
-- National Socialism
-- Neoliberalism
-- Pacifism
-- Paleolibertarianism
-- Political symbolism
-- Panislamism
-- Peronism
-- Populism
-- Political bias
-- Post Communism
-- Progressivism
-- Putinism
-- Racial purity
-- Racial segregation
-- Racialism
-- Radical centrism
-- Radical liberalism
-- Rationalism
-- Republicanism
-- Screen theory
-- Slavophile
-- Social Credit
-- Social democracy
-- Socialism
-- Social issue
-- Social liberalism
-- Social philosophy
-- Sphere of influence
-- Stalinism
-- Thatcherism
-- Third Position
-- Totalitarianism
-- Tribalism
-- Trotskyism
-- Utilitarianism
+- noun:
+  - Anarchism
+  - Anarcho capitalism
+  - Anarcho primitivism
+  - Anarcho syndicalism
+  - Anarchist communism
+  - Anti communism
+  - Asian values
+  - Authoritarianism
+  - Bioregionalism
+  - Black populism
+  - Bourguibism
+  - Black supremacy
+  - Bolivarian Revolution
+  - Capitalism
+  - Christian democracy
+  - Christian socialism
+  - Classical liberalism
+  - Classical republicanism
+  - Collectivism
+  - Communism
+  - Communitarianism
+  - Conservatism
+  - Corporatocracy
+  - Demarchy
+  - Democracy
+  - Democratic peace theory
+  - Democratic socialism
+  - Democratic transhumanism
+  - Eco-socialism
+  - Egalitarianism
+  - Fascism
+  - Federalism
+  - Fennos Paradox
+  - Green anarchism
+  - Green politics
+  - Hindu nationalism
+  - Individualist anarchism
+  - Integral humanism
+  - Internationalism
+  - Islamism
+  - Isocracy
+  - Kemalism
+  - Leftism
+  - Left libertarianism
+  - Liberalism
+  - Libertarianism
+  - Libertarian socialism
+  - Localism
+  - Majoritarianism
+  - Marxism
+  - Marxism Leninism
+  - Marxist philosophy
+  - Meritocracy
+  - Minarchism
+  - Minoritarianism
+  - Miscegenation
+  - Monarchism
+  - Nationalism
+  - National Socialism
+  - Neoliberalism
+  - Pacifism
+  - Paleolibertarianism
+  - Political symbolism
+  - Panislamism
+  - Peronism
+  - Populism
+  - Political bias
+  - Post Communism
+  - Progressivism
+  - Putinism
+  - Racial purity
+  - Racial segregation
+  - Racialism
+  - Radical centrism
+  - Radical liberalism
+  - Rationalism
+  - Republicanism
+  - Screen theory
+  - Slavophile
+  - Social Credit
+  - Social democracy
+  - Socialism
+  - Social issue
+  - Social liberalism
+  - Social philosophy
+  - Sphere of influence
+  - Stalinism
+  - Thatcherism
+  - Third Position
+  - Totalitarianism
+  - Tribalism
+  - Trotskyism
+  - Utilitarianism
 Pandemic:
-- Antibodies
-- Community spread
-- Containment
-- COVID-19
-- Epidemic
-- Fatality rate
-- Flattening the curve
-- Herd immunity
-- Immunocompromised
-- Incidence
-- Incubation
-- Intubation
-- Isolation
-- Middle East respiratory syndrome
-- Mortality and morbidity
-- Pandemic
-- social distancing
-- Personal Protective Equipment
-- Respirator
-- R-naught
-- Self-quarantine
-- Severe acute respiratory syndrome
-- Ventilator
+- noun:
+  - Antibodies
+  - Community spread
+  - Containment
+  - COVID-19
+  - Epidemic
+  - Fatality rate
+  - Herd immunity
+  - Immunocompromised
+  - Incidence
+  - Incubation
+  - Intubation
+  - Isolation
+  - Middle East respiratory syndrome
+  - Mortality and morbidity
+  - Pandemic
+  - Personal Protective Equipment
+  - Respirator
+  - R-naught
+  - Self-quarantine
+  - Severe acute respiratory syndrome
+  - Ventilator
+- verb:
+  - social distancing
+- phrase:
+  - Flattening the curve
 ICS:
-- Java
-- Ready to Program
-- HSA
-- Console
-- Class Constructor
-- Objects
-- Object Oriented Programming
-- Methods
-- If Statement
-- For Loop
-- While Loop
-- Do While Loop
-- Switch Statement
-- Return Method
-- Recursion
-- Errortrapping
-- Try-Catch Statement
-- Casting
-- Boolean
-- Character
-- Integer
-- Long
-- Float
-- Double
-- String
-- Array
-- Math
-- Graphics
+- noun:
+  - Java
+  - Ready to Program
+  - HSA
+  - Console
+  - Class Constructor
+  - Objects
+  - Object Oriented Programming
+  - Methods
+  - If Statement
+  - For Loop
+  - While Loop
+  - Do While Loop
+  - Switch Statement
+  - Return Method
+  - Recursion
+  - Errortrapping
+  - Try-Catch Statement
+  - Casting
+  - Boolean
+  - Character
+  - Integer
+  - Long
+  - Float
+  - Double
+  - String
+  - Array
+  - Math
+  - Graphics
