@@ -61,7 +61,6 @@ class Phrase {
 
 public class WheelOfFortune {
     private Console console;
-    private Random rng;
 
     public static final int NUMBER_OF_PHRASES=10;
 
@@ -148,8 +147,6 @@ public class WheelOfFortune {
         phrases=new HashMap();
         playerScores=new ArrayList();
 
-        rng=new Random();
-        
         readPhrasesFromFile();
         readScoresFromFile();
 
@@ -702,7 +699,8 @@ public class WheelOfFortune {
 	drawChatBox(chatBoxLines);
 
         List phrasesInCategory=(List)phrases.get(category);
-        int phraseIndex = -1;
+        Collections.shuffle(phrasesInCategory, new Random());
+        int phraseIndex = 0;
         Phrase phrase = new Phrase("", "", "");
         char[] currentlyGuessed = new char[0];
         Set availableLetters=new HashSet();
@@ -720,7 +718,7 @@ public class WheelOfFortune {
         for(int loop=0;loop<NUMBER_OF_PHRASES;++loop)
         {
             if (newPhrase) {
-                phraseIndex=rng.nextInt(phrasesInCategory.size());
+                phraseIndex++;
                 phrase=(Phrase)(phrasesInCategory.get(phraseIndex));
                 System.out.println(phrase.text);
                 currentlyGuessed=new char[phrase.text.length()];
