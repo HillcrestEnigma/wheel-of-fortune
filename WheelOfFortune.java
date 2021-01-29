@@ -239,12 +239,15 @@ public class WheelOfFortune {
         Color filledColor = new Color(242, 242, 242);
         for (int i=0; i<grid[0].length; i++) {
             for (int j=0; j<grid.length; j++) {
-                if (grid[j][i] != 0) console.setColor(filledColor);
-                else console.setColor(emptyColor);
+                if (grid[j][i] == 0) console.setColor(emptyColor);
+                else console.setColor(filledColor);
                 if (grid[j][i] == '_') grid[j][i] = ' ';
                 console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1);
-                console.setColor(Color.black);
-                console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65)));
+                if(grid[j][i]!=0)
+                {
+                    console.setColor(Color.black);
+                    console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65)));
+                }
             }
         }
     }
