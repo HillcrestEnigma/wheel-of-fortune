@@ -288,6 +288,10 @@ public class WheelOfFortune {
             {
                 sliceStr="LOSE A TURN";
             }
+            else if(WHEEL_VALUES[i]==COMMUNISM)
+            {
+                sliceStr="COMMUNISM";
+            }
             else
             {
                 sliceStr="$"+WHEEL_VALUES[i];
@@ -903,6 +907,16 @@ public class WheelOfFortune {
                         player2Balance = 0;
                         drawPlayerInfo(2, player2Name, player2Balance, true);
                     }
+                    break;
+                } else if (letterValue == COMMUNISM) {
+                    chatBoxLines.add(formatDialog(HOST_NAME, "COMMUNISMM"));
+                    chatBoxLines.add(formatDialog(HOST_NAME, "SPLIT THE CASH YOU GREEDY CAPITALISTS!"));
+                    drawChatBox(chatBoxLines);
+                    int equalBalance = (player1Balance + player2Balance) / 2;
+                    player1Balance = equalBalance;
+                    player2Balance = equalBalance;
+                    drawPlayerInfo(1, player1Name, player1Balance, player1Turn);
+                    drawPlayerInfo(2, player2Name, player2Balance, !player1Turn);
                     break;
                 }
 
