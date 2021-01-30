@@ -8,6 +8,19 @@
 /* Program Purpose: Recreate the Wheel of Fortune game in Ready to Program
  * Variables:
  * - Console console: reference to console
+ *
+ * Citations:
+ * https://stackoverflow.com/questions/22839618/how-to-get-pixel-color-from-graphics-g
+ * https://stackoverflow.com/questions/14124593/how-to-rotate-graphics-in-java
+ * https://stackoverflow.com/questions/18073590/sort-list-in-reverse-in-order
+ * 
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/List.html
+ * https://docs.oracle.com/javase/9/docs/api/java/lang/Comparable.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Set.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Map.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Collections.html
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/image/BufferedImage.html
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/Graphics2D.html
  */
 
 import java.awt.*;
@@ -22,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
-
 
 
 public class WheelOfFortune {
