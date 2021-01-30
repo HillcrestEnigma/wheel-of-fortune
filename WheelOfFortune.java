@@ -200,36 +200,59 @@ public class WheelOfFortune {
         }
     }
 
+    /* Draws the base of the wheel to a Graphics2D object
+     *
+     * +-----------------------+------------------------------------------+
+     * |       Variable        |               Description                |
+     * +-----------------------+------------------------------------------+
+     * | Graphics2D graphics   | object to be drawn onto                  |
+     * | Color[] WHEEL_COLORS  | colour of each wheel section             |
+     * | int radius            | radius of wheel                          |
+     * | double angle          | current angle of wheel (in radians)      |
+     * | int SLICES            | number of wheel slices                   |
+     * | int linesToDraw       | number of radial lines to draw           |
+     * | int linesPerSlice     | number of radial lines to draw per slice |
+     * | int xPrev             | x-coordinate of radial line              |
+     * | int yPrev             | y-coordinate of radial line              |
+     * +-----------------------+------------------------------------------+
+     */
     private void drawWheelBaseToGraphics(Graphics2D graphics,Color[] WHEEL_COLORS,int radius, double angle)
     {
         final int SLICES=WHEEL_VALUES.length;
         int linesToDraw=(int)(2*Math.PI*radius);
         int linesPerSlice=linesToDraw/SLICES+1;
 
+        // previous radial line (used in loop)
         int xPrev=(int)(Math.cos(angle)*radius)+radius;
         int yPrev=(int)(Math.sin(angle)*radius)+radius;
 
-        for(int i=0;i<linesToDraw;++i)
+        for(int i=0;i<linesToDraw;++i) // draw wheel using thin radial triangles
         {
-            double lineAngle=angle+2*Math.PI*i/linesToDraw;
+            double lineAngle=angle+2*Math.PI*i/linesToDraw; // angle of line
             graphics.setColor(WHEEL_COLORS[i/linesPerSlice]);
-            if(i%linesPerSlice<3)
+            if(i%linesPerSlice<3) // separate sections of wheel with solid black line
             {
                 graphics.setColor(Color.BLACK);
             }
+
+            // new radial line
             int xNew=(int)(Math.cos(lineAngle)*radius)+radius;
             int yNew=(int)(Math.sin(lineAngle)*radius)+radius;
+
+            // draw triangle
             graphics.fillPolygon(new int[]{radius,xPrev,xNew},new int[]{radius,yPrev,yNew},3);
+
             xPrev=xNew;
             yPrev=yNew;
         }
         graphics.setColor(Color.BLACK);
-        for(int i=0;i<linesToDraw;++i)
+        for(int i=0;i<linesToDraw;++i) // draw border of wheel using small circles
         {
             double lineAngle=angle+2*Math.PI*i/linesToDraw;
+            // calculate position of border
             int xBorder=(int)(Math.cos(lineAngle)*(radius-1))+radius;
             int yBorder=(int)(Math.sin(lineAngle)*(radius-1))+radius;
-            graphics.fillOval(xBorder-2,yBorder-2,4,4);
+            graphics.fillOval(xBorder-2,yBorder-2,4,4); // draw circle
         }
 
     }
