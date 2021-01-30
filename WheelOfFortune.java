@@ -391,11 +391,14 @@ public class WheelOfFortune {
         console.drawImage(bufferedImage,WHEEL_X-WHEEL_RADIUS,WHEEL_Y-WHEEL_RADIUS,null); // draw the bufferedImage to the console window
     }
 
+    // overload of drawLetterGrid that also draws the available letters
     private void drawLetterGrid(char[][] grid,Set available)
     {
         drawLetterGrid(grid,LETTER_GRID_X,LETTER_GRID_Y,LETTER_GRID_CELL_SIZE);
         drawAvailableLetters(available);
     }
+
+    // wrapper around drawLetterGrid to make it take up the entire screen
     private void drawFullScreenLetterGrid(char[][] grid)
     {
         drawLetterGrid(grid,
@@ -403,83 +406,143 @@ public class WheelOfFortune {
                 FS_LETTER_GRID_Y,
                 FS_LETTER_GRID_CELL_SIZE);
     }
+
+    /* Draws grid of letters for the game
+     *
+     * +---------------+----------------------+
+     * |   Variable    |     Description      |
+     * +---------------+----------------------+
+     * | char[][] grid | grid of letters      |
+     * | int x         | x-coordinate of grid |
+     * | int y         | y-coordinate of grid |
+     * +---------------+----------------------+
+     */
     private void drawLetterGrid(char[][] grid,int x, int y,int squareSize) {
         console.setFont(new Font("Arial", Font.PLAIN, squareSize/2));
         Color emptyColor = new Color(153, 204, 255);
         Color filledColor = new Color(242, 242, 242);
-        for (int i=0; i<grid[0].length; i++) {
-            for (int j=0; j<grid.length; j++) {
-                if (grid[j][i] == 0) console.setColor(emptyColor);
-                else console.setColor(filledColor);
+        for (int i=0; i<grid[0].length; i++) { // rows of grid
+            for (int j=0; j<grid.length; j++) { // columns of grid
+                if (grid[j][i] == 0) console.setColor(emptyColor); // grid cell is empty
+                else console.setColor(filledColor); // grid cell not empty
                 if (grid[j][i] == '_') grid[j][i] = ' ';
-                console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1);
-                if(grid[j][i]!=0)
+                console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1); // draw grid cell rectangle
+                if(grid[j][i]!=0) // if grid cell not empty
                 {
                     console.setColor(Color.black);
-                    console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65)));
+                    console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65))); // draw letter
                 }
             }
         }
     }
 
+    /* Converts a string to a character grid
+     *
+     * +---------------+----------------------------------+
+     * |   Variable    |           Description            |
+     * +---------------+----------------------------------+
+     * | String str    | String to be processed           |
+     * | int rows      | number of rows                   |
+     * | int cols      | number of columns                |
+     * | char[][] grid | character grid                   |
+     * | words         | String split into separate words |
+     * +---------------+----------------------------------+
+     */
     private char[][] stringToCharacterGrid(String str,int rows,int cols)
     {
         char[][] grid=new char[rows][cols];
-        String[] words=str.split("\0");
-        int currentRow=0,currentCol=0;
-        for(int i=0;i<words.length;++i)
+        String[] words=str.split("\0"); // split str
+        int currentRow=0,currentCol=0; // current position in grid
+        for(int i=0;i<words.length;++i) // iterate over the words
         {
             String currentWord=words[i].toUpperCase();
             while(currentRow<rows)
             {
-                if(cols-currentCol >= currentWord.length())
+                if(cols-currentCol >= currentWord.length()) // check if there is enough space in row
                 {
-                    for(int j=0;j<currentWord.length();++j)
+                    for(int j=0;j<currentWord.length();++j) // copy word over to grid
                     {
-                        grid[currentRow][currentCol+j]=currentWord.charAt(j);
+                        grid[currentRow][currentCol+j]=currentWord.charAt(j); // copy a character
                     }
                     currentCol+=currentWord.length()+1;
                     break;
                 }
                 else
                 {
-                    ++currentRow;
-                    currentCol=0;
+                    ++currentRow; // increment row
+                    currentCol=0; // move to first column
                 }
             }
         }
-        return grid;
+        return grid; // return newly created grid
     }
 
-    
-
+    /*
+     * Draws a button, identified by a key which the user can presson their keyboard
+     * +-------------------+---------------------------------------+
+     * |     Variable      |              Description              |
+     * +-------------------+---------------------------------------+
+     * | int x             | x-coordinate of button                |
+     * | int y             | y-coordinate of button                |
+     * | String action     | text on button                        |
+     * | char key          | button identifier                     |
+     * | boolean activated | whether the button has been activated |
+     * +-------------------+---------------------------------------+
+     */
     private void drawButton(int x, int y, String action, char key, boolean activated) {
         console.setColor(Color.black);
-        console.drawRect(x, y, 200, 50);
+        console.drawRect(x, y, 200, 50); // button border
         console.drawRect(x+150, y, 50, 50);
-        if (activated) console.setColor(new Color(204, 255, 204));
+        if (activated) console.setColor(new Color(204, 255, 204)); // change button colour if activated
         else console.setColor(Color.white);
         console.fillRect(x+1, y+1, 149, 49);
         console.fillRect(x+151, y+1, 49, 49);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 20));
-        console.drawString(action, (int)(x+16), (int)(y+33));
-        console.drawString("" + key, (int)(x+168), (int)(y+33));
+        console.drawString(action, (int)(x+16), (int)(y+33)); // draw button action name
+        console.drawString("" + key, (int)(x+168), (int)(y+33)); // draw button key
     }
 
+    /* Draws the host of the game
+     *
+     * +----------+----------------------+
+     * | Variable |     Description      |
+     * +----------+----------------------+
+     * | int x    | x-coordinate of host |
+     * | int y    | y-coordinate of host |
+     * +----------+----------------------+
+     */
     private void drawHost(int x, int y) {
         console.setColor(Color.black);
-        console.fillOval(x, y, 50, 50);
-        console.fillRect(x+5, y+45, 40, 100);
+        console.fillOval(x, y, 50, 50); // circular head
+        console.fillRect(x+5, y+45, 40, 100); // rectangular body
     }
 
+    /* Draws the platform which the host stands on
+     *
+     * +----------+--------------------------+
+     * | Variable |       Description        |
+     * +----------+--------------------------+
+     * | int x    | x-coordinate of platform |
+     * | int y    | y-coordinate of platform |
+     * +----------+--------------------------+
+     */
     private void drawHostPlatform(int x, int y) {
         console.setColor(Color.gray);
         console.fillOval(x-25, y+120, 100, 50);
     }
 
-    
-
+    /* Draws a generic sidebar widget
+     *
+     * +-------------+------------------------------+
+     * |  Variable   |         Description          |
+     * +-------------+------------------------------+
+     * | int x       | x-coordinate of widget       |
+     * | int y       | y-coordinate of widget       |
+     * | String text | text displayed on widget     |
+     * | Color color | background colour for widget |
+     * +-------------+------------------------------+
+     */
     private void drawGenericSidebarWidget(int x, int y, String text, Color color) {
         console.setColor(Color.black);
         console.drawRect(x, y, SIDEBAR_WIDTH, SIDEBAR_ITEM_HEIGHT);
@@ -490,14 +553,28 @@ public class WheelOfFortune {
         console.drawString(text, (int)(x+16), (int)(y+SIDEBAR_ITEM_HEIGHT*33/50.0));
     }
 
+    // overload of drawGenericSidebarWidget() using default colour
     private void drawGenericSidebarWidget(int x, int y, String text) {
         drawGenericSidebarWidget(x, y, text, new Color(255, 204, 204));
     }
 
+    // wrapper around drawGenericSidebarWidget() to draw the heading for the sidebar
     private void drawSidebarHeading(int x, int y, String text) {
         drawGenericSidebarWidget(x, y, text, new Color(255, 153, 102));
     }
 
+    /* Draws the info (balance, name, current turn, etc) of a player
+     *
+     * +---------------------+------------------------------+
+     * |      Variable       |         Description          |
+     * +---------------------+------------------------------+
+     * | int playerID        | ID of player (either 1 or 2) |
+     * | String name         | player's name                |
+     * | int balance         | player's balance             |
+     * | boolean currentTurn | is it the player's turn      |
+     * | boolean isWinner    | did the player win           |
+     * +---------------------+------------------------------+
+     */
     private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn, boolean isWinner) {
         Color color;
         if (currentTurn) color = new Color(255, 204, 102);
@@ -506,6 +583,7 @@ public class WheelOfFortune {
         drawGenericSidebarWidget(PLAYER_LIST_X, PLAYER_LIST_Y + SIDEBAR_ITEM_HEIGHT*playerID, name + " - $" + balance, color);
     }
 
+    // overload of drawPlayerInfo() using default of false for isWinner
     private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn) {
         drawPlayerInfo(playerID, name, balance, currentTurn, false);
     }
