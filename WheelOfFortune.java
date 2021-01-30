@@ -198,6 +198,38 @@ public class WheelOfFortune {
 
     }
 
+    private void drawAvailableLetters(Set available)
+    {
+        final int REMAINING_LETTERS_BAR_HEIGHT=CONSOLE_HEIGHT/20;
+        final int REMAINING_LETTERS_BAR_X=CHAT_BOX_X;
+        final int REMAINING_LETTERS_BAR_Y=CHAT_BOX_Y-CONSOLE_HEIGHT/8;
+
+        console.setFont(new Font("Arial", Font.PLAIN, REMAINING_LETTERS_BAR_HEIGHT/2));
+
+        for(int i=0;i<26;++i)
+        {
+            int x,y;
+            if(i<13)
+            {
+                x=REMAINING_LETTERS_BAR_X+i*REMAINING_LETTERS_BAR_HEIGHT;
+                y=REMAINING_LETTERS_BAR_Y;
+            }
+            else
+            {
+                x=REMAINING_LETTERS_BAR_X+(i-13)*REMAINING_LETTERS_BAR_HEIGHT;
+                y=REMAINING_LETTERS_BAR_Y+REMAINING_LETTERS_BAR_HEIGHT;
+            }
+            console.setColor(Color.LIGHT_GRAY);
+            console.fillOval(x-REMAINING_LETTERS_BAR_HEIGHT/3,y-REMAINING_LETTERS_BAR_HEIGHT*2/3,REMAINING_LETTERS_BAR_HEIGHT,REMAINING_LETTERS_BAR_HEIGHT);
+            char c=(char)('A'+i);
+            if(available.contains(new Character(c)))
+            {
+                console.setColor(Color.BLACK);
+                console.drawString(Character.toString(c),x,y);
+            }
+        }
+    }
+
     private void drawWheelTextToGraphics(Graphics2D graphics,int radius, double angle)
     {
         graphics.rotate(angle-Math.PI*0.3,radius,radius);
@@ -252,9 +284,10 @@ public class WheelOfFortune {
         console.drawImage(bufferedImage,x-radius,y-radius,null);
     }
 
-    private void drawLetterGrid(char[][] grid)
+    private void drawLetterGrid(char[][] grid,Set available)
     {
         drawLetterGrid(grid,LETTER_GRID_X,LETTER_GRID_Y,LETTER_GRID_CELL_SIZE);
+        drawAvailableLetters(available);
     }
     private void drawFullScreenLetterGrid(char[][] grid)
     {
@@ -679,7 +712,7 @@ public class WheelOfFortune {
 
 
 
-        drawLetterGrid(new char[LETTER_GRID_ROWS][LETTER_GRID_COLS]);
+        drawLetterGrid(new char[LETTER_GRID_ROWS][LETTER_GRID_COLS],new HashSet());
 
         drawHostPlatform(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
         drawHost(CHAT_BOX_X+CHAT_BOX_WIDTH*6/5, CHAT_BOX_Y+20);
@@ -761,7 +794,8 @@ public class WheelOfFortune {
                         new String(currentlyGuessed),
                         LETTER_GRID_ROWS,
                         LETTER_GRID_COLS
-                    )
+                    ),
+                    availableLetters
                 );
 
                 newPhrase = false;
@@ -892,7 +926,8 @@ public class WheelOfFortune {
                             new String(currentlyGuessed),
                             LETTER_GRID_ROWS,
                             LETTER_GRID_COLS
-                        )
+                        ),
+                        availableLetters
                     );
 
                     if (occurences == 0) break;
@@ -999,7 +1034,8 @@ public class WheelOfFortune {
                                 new String(currentlyGuessed),
                                 LETTER_GRID_ROWS,
                                 LETTER_GRID_COLS
-                            )
+                            ),
+                            availableLetters
                         );
 
                         break;
