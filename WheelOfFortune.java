@@ -782,108 +782,182 @@ public class WheelOfFortune {
         }
     }
 
+    /* Writes player scores to file
+     *
+     * +-------------------------+-----------------------+
+     * |        Variable         |      Description      |
+     * +-------------------------+-----------------------+
+     * | PrintWriter output      | output stream         |
+     * | PlayerScore playerScore | the score of a player |
+     * +-------------------------+-----------------------+
+     */
     private void writeScoresToFile()
     {
         try
         {
-            PrintWriter output=new PrintWriter(new FileWriter(SCORE_FILE_NAME));
-            for(int i=0;i<playerScores.size();++i)
+            PrintWriter output=new PrintWriter(new FileWriter(SCORE_FILE_NAME)); // open output stream
+            for(int i=0;i<playerScores.size();++i) // iterate over player scores
             {
                 PlayerScore playerScore=(PlayerScore)playerScores.get(i);
-                output.println(playerScore.playerName+","+playerScore.score);
+                output.println(playerScore.playerName+","+playerScore.score); // output player score to file
             }
-            output.close();
+            output.close(); // close output stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when writing to file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
-
+    
+    /* formats a dialog message
+     *
+     * +----------------+-----------------+
+     * |    Variable    |   Description   |
+     * +----------------+-----------------+
+     * | String speaker | name of speaker |
+     * | String message | message text    |
+     * +----------------+-----------------+
+     */
     public String formatDialog(String speaker,String message)
     {
         return speaker+": "+message;
     }
 
+    // draws the interaction area rectangle
     public void drawInteractionArea()
     {
         console.setColor(Color.LIGHT_GRAY);
         console.fillRect(0,INTERACTION_AREA_Y,CONSOLE_WIDTH,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
     }
+
+    // draws a String str to the interaction area
     public void drawToInteractionArea(String str)
     {
-        drawInteractionArea();
-        console.setCursor(INTERACTION_AREA_ROW+1,INTERACTION_AREA_COL);
-        console.print(str);
+        drawInteractionArea(); // draw interaction area rectangle
+        console.setCursor(INTERACTION_AREA_ROW+1,INTERACTION_AREA_COL); // move cursor
+        console.print(str); // print str
     }
+
+    /* accepts a string from the interaction area
+     *
+     * +-----------------+--------------------------+
+     * |    Variable     |       Description        |
+     * +-----------------+--------------------------+
+     * | String prompt   | prompt given to the user |
+     * | int lengthLimit | maximum length of input  |
+     * | String answer   | user input               |
+     * +-----------------+--------------------------+
+     */
     public String acceptString(String prompt,int lengthLimit)
     {
-        while(true)
+        while(true) // loop until user enters a valid string
         {
-            drawToInteractionArea(prompt);
-            String answer=console.readLine();
-            if(answer.length()>lengthLimit)
+            drawToInteractionArea(prompt); // draw prompt to interaction area
+            String answer=console.readLine(); // read string from console
+            if(answer.length()>lengthLimit) // answer too long; try again
             {
                 console.println("The string which you entered was too long! Please try again.\nPress any key to continue ...");
-                console.getChar();
+                console.getChar(); // wait for user to press key
                 continue;
             }
-            else
+            else // answer is valid; return answer
             {
-                return answer;
+                return answer; 
             }
         }
     }
 
+    /* accept a choice from user (drawn over interaction area)
+     * +------------------+--------------------------+
+     * |     Variable     |       Description        |
+     * +------------------+--------------------------+
+     * | String prompt    | prompt given to the user |
+     * | String[] choices | list of choices          |
+     * +------------------+--------------------------+
+     */
     public int acceptChoice(String prompt, String[] choices) {
         console.setFont(new Font("Arial", Font.PLAIN, 15));
-        drawToInteractionArea(prompt);
+        drawToInteractionArea(prompt); // draw prompt to interaction area
         for (int i=0; i<choices.length; i++) {
+            // indicate choice using a button
             drawButton(100 + (i%3)*250, INTERACTION_AREA_Y + (CONSOLE_HEIGHT-INTERACTION_AREA_Y)/2 + (i/3)*100, choices[i], (char)(i+'1'), false);
         }
+        // available keys for user to press
         char[] availableLetters = new char[choices.length];
         for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
-        return (int)(acceptChar(availableLetters)-'1');
+        return (int)(acceptChar(availableLetters)-'1'); // return index of choice
     }
 
+    /* accept a character from user
+     *
+     * +------------------+-------------------------+
+     * |     Variable     |       Description       |
+     * +------------------+-------------------------+
+     * | char[] available | available characters    |
+     * | char input       | character input by user |
+     * +------------------+-------------------------+
+     */
     public char acceptChar(char[] available) {
-        char input = console.getChar();
-        for (int i=0; i<available.length; i++) if (input == available[i]) return input;
+        char input = console.getChar(); // get input
+        for (int i=0; i<available.length; i++) if (input == available[i]) return input; // if input character is available, then return it
+
+        // otherwise, ask the user to try again
         new Message("Please enter a valid option.");
         return acceptChar(available);
     }
 
+    /* accept a menu choice from user 
+     * +------------------+--------------------------+
+     * |     Variable     |       Description        |
+     * +------------------+--------------------------+
+     * | String prompt    | prompt given to the user |
+     * | String[] choices | list of choices          |
+     * +------------------+--------------------------+
+     */
     public int acceptMenuChoice(String prompt, String[] choices) {
         console.clear();
         console.setFont(new Font("Arial", Font.PLAIN, 15));
-        console.println(prompt);
+        console.println(prompt); // print prompt to console
         for (int i=0; i<choices.length; i++) {
+            // indicate choice using a button
             drawButton(50 + (i%3)*250, 300 + (i/3)*100, choices[i], (char)(i+'1'), false);
         }
+        // available keys for user to press
         char[] availableLetters = new char[choices.length];
         for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
-        return (int)(acceptChar(availableLetters)-'1');
+        return (int)(acceptChar(availableLetters)-'1'); // return index of choice
     }
 
+    // wait for the user to press any key to continue
     public void pauseProgram() {
         drawToInteractionArea("Press any key to continue.");
         console.getChar();
     }
 
+    /* Main menu of program
+     * Returns true if the user wants to exit the game, false otherwise
+     *
+     * +--------------------------+--------------------------+
+     * |         Variable         |       Description        |
+     * +--------------------------+--------------------------+
+     * | String[] mainMenuChoices | list of choices for user |
+     * | int menuChoice           | choice selected by user  |
+     * +--------------------------+--------------------------+
+     */
     public boolean mainMenu() {
         String[] mainMenuChoices = {"New round", "Leaderboard", "Instructions", "Exit game"};
         int menuChoice = acceptMenuChoice("Please select what you want to do.", mainMenuChoices);
         console.clear();
         if (menuChoice == 0) {
-            if (newRound()) return true;
+            if (newRound()) return true; // user chose to exit within newRound(); return true
         } else if (menuChoice == 1) {
-            leaderboard();
+            leaderboard(); // display leaderboard
         } else if (menuChoice == 2) {
-            instructions();
+            instructions(); // display instructions
         } else {
-            return true;
+            return true; // exit game
         }
-        return false;
+        return false; // do not exit game
     }
 
     public boolean newRound()
