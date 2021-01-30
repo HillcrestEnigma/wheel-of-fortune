@@ -23,25 +23,24 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 
-class PlayerScore implements Comparable
+class PlayerScore implements Comparable // class to store the score of a player and their name
 {
-    public final String playerName;
-    public final int score;
+    public final String playerName; // name of player
+    public final int score; // player's score
     public PlayerScore(String pn,int sc)
     {
         score=sc;
         playerName=pn;
     }
-    public int compareTo(Object o)
+    public int compareTo(Object o) // compares two PlayerScores (used when sorting a list of PlayerScores)
     {
         PlayerScore other=(PlayerScore)o;
-        if(score==other.score)
+        if(score==other.score) // scores equal; compare names
         {
             return playerName.compareTo(other.playerName);
         }
-        else
+        else // compare scores
         {
             return new Integer(score).compareTo(new Integer(other.score));
         }
@@ -49,7 +48,7 @@ class PlayerScore implements Comparable
 }
 
 public class WheelOfFortune {
-    private Console console;
+    private Console console; // console window
 
     public static final int NUMBER_OF_PHRASES=10;
 
@@ -739,7 +738,7 @@ public class WheelOfFortune {
 	drawChatBox(chatBoxLines);
 
         List phrasesInCategory=(List)phrases.get(category);
-        Collections.shuffle(phrasesInCategory, new Random());
+        Collections.shuffle(phrasesInCategory);
         int phraseIndex = -1;
         String phrase = "";
         String phraseType = "";
