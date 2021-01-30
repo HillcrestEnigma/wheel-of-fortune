@@ -176,6 +176,8 @@ public class WheelOfFortune {
 
         // draw the splash screen animation
         drawSplashScreen();
+
+        Collections.sort(playerScores,Collections.reverseOrder());
     }
 
     private void drawSplashScreen()
