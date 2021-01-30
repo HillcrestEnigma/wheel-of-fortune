@@ -556,6 +556,7 @@ public class WheelOfFortune {
      */
     private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn, boolean isWinner) {
         Color color;
+        // change color based on player status
         if (currentTurn) color = new Color(255, 204, 102);
         else if (isWinner) color = new Color(204, 255, 204);
         else color = new Color(255, 204, 204);
@@ -567,6 +568,15 @@ public class WheelOfFortune {
         drawPlayerInfo(playerID, name, balance, currentTurn, false);
     }
 
+    /* Draws the scrolling chat box
+     *
+     * +----------------+--------------------------------------+
+     * |    Variable    |             Description              |
+     * +----------------+--------------------------------------+
+     * | List lines     | List of lines                        |
+     * | int topMessage | index of top message to be displayed |
+     * +----------------+--------------------------------------+
+     */
     private void drawChatBox(List lines) {
         console.setColor(Color.black);
         console.drawRect(CHAT_BOX_X, CHAT_BOX_Y, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
@@ -574,12 +584,13 @@ public class WheelOfFortune {
         console.fillRect(CHAT_BOX_X+1, CHAT_BOX_Y+1, CHAT_BOX_WIDTH-1, CHAT_BOX_HEIGHT-1);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 16));
-        int topMessage = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES);
-        for (int i = 0; i<Math.min(CHAT_BOX_MAX_LINES, lines.size()); i++) {
-            console.drawString((String)lines.get(i + topMessage), CHAT_BOX_X+16, CHAT_BOX_Y+20 + (i)*20);
+        int topMessage = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES); // find top message
+        for (int i = 0; i<Math.min(CHAT_BOX_MAX_LINES, lines.size()); i++) { // iterate over messages
+            console.drawString((String)lines.get(i + topMessage), CHAT_BOX_X+16, CHAT_BOX_Y+20 + (i)*20); // draw message
         }
     }
 
+    // Draws the sidebar
     private void drawSidebar() {
         console.setColor(new Color(255, 102, 102));
         console.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, INTERACTION_AREA_Y);
@@ -596,141 +607,178 @@ public class WheelOfFortune {
         console.fillOval(WHEEL_X - WHEEL_RADIUS*13/16, WHEEL_Y + WHEEL_RADIUS*13/16, 10, 10);
     }
 
+    // Parses a category marker from a String line
     private String parseCategoryMarker(String line)
     {   // returns the category name if line is a category marker
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(!line.startsWith("- ") && line.charAt(line.length()-1)==':')
         {
-            return line.substring(0,line.length()-1);
+            return line.substring(0,line.length()-1); // remove trailing ':'
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    // Parses a type marker from a String line
     private String parseTypeMarker(String line)
-    {   // returns the phrase if line is a phrase
+    {   // returns the type marker if line is a type marker
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(line.startsWith("- ") && line.charAt(line.length()-1) == ':')
         {
-            return line.substring(2,line.length()-1).trim();
+            return line.substring(2,line.length()-1).trim(); // remove leading '-' and trailing ':'
 
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    // Parses a phrase from a String line
     private String parsePhrase(String line)
     {   // returns the phrase if line is a phrase
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(line.startsWith("- "))
         {
-            return line.substring(2,line.length()).trim();
-
+            return line.substring(2,line.length()).trim(); // remove leading '-'
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    /* Adds a phrase to the phrase database
+     *
+     * +----------------------+-------------------------------+
+     * |       Variable       |          Description          |
+     * +----------------------+-------------------------------+
+     * | String phrase        | the phrase                    |
+     * | String category      | category of phrase            |
+     * | String type          | type of phrase                |
+     * | List categoryPhrases | list of phrases in a category |
+     * +----------------------+-------------------------------+
+     */
     private void addPhraseToMap(String phrase,String category,String type)
     {
-        if(!phrases.containsKey(category))
+        if(!phrases.containsKey(category)) // initialize category if it doesn't exist yet
         {
-            phrases.put(category,new ArrayList());
+            phrases.put(category,new ArrayList()); // initialize empty ArrayList 
         }
-        List categoryPhrases=(List)phrases.get(category);
-        categoryPhrases.add(phrase);
-        phraseTypes.put(phrase, type);
+        List categoryPhrases=(List)phrases.get(category); // fetch list of phrases in category
+        categoryPhrases.add(phrase); // add phrase to category
+        phraseTypes.put(phrase, type); // add phrase to phraseTypes
     }
     
+    /* Reads the phrases from phrase file
+     * 
+     * +------------------------+----------------------------------------+
+     * |        Variable        |              Description               |
+     * +------------------------+----------------------------------------+
+     * | BufferedReader input   | input stream                           |
+     * | String line            | line in file                           |
+     * | String currentCategory | the category currently being processed |
+     * | String currentType     | the type currently being processed     |
+     * +------------------------+----------------------------------------+
+     */
     private void readPhrasesFromFile()
     {
         try
         {
-            BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME));
+            BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME)); // open input stream
             String line;
+            // initialize category and type
             String currentCategory="DEFAULT";
             String currentType="DEFAULT";
-            while((line=input.readLine())!=null)
+            while((line=input.readLine())!=null) // keep on reading until end of file
             {
                 line=line.trim();
-                String categoryMarker=parseCategoryMarker(line);
+
+                //attempt to parse a category marker and a type marker from line
+                String categoryMarker=parseCategoryMarker(line); 
                 String typeMarker=parseTypeMarker(line);
-                if(categoryMarker.length()>0)
+                if(categoryMarker.length()>0) // category marker found
                 {
                     currentCategory=categoryMarker;
                 }
-                else if (typeMarker.length()>0)
+                else if (typeMarker.length()>0) // type marker found
                 {
                     currentType=typeMarker;
                 }
-                else {
+                else { // phrase found
                     String phrase=parsePhrase(line);
                     if(phrase.length()>0)
                     {
-                        addPhraseToMap(phrase,currentCategory,currentType);
+                        addPhraseToMap(phrase,currentCategory,currentType); // add phrase to phrase database
                     }
                 }
             }
-            input.close();
+            input.close(); // close input stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when reading from file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
 
+    // Parse a PlayerScore from a line
     private PlayerScore parseScore(String line)
     {
-        line=line.trim();
-        String[] parts=line.split("\\s*,\\s*");
-        if(parts.length!=2)
+        line=line.trim(); // trim the line
+        String[] parts=line.split("\\s*,\\s*"); // split line into parts
+        if(parts.length!=2) // not a PlayerScore; return null
         {
             return null;
         }
-        else
+        else // is a PlayerScore
         {
-            return new PlayerScore(parts[0],Integer.parseInt(parts[1]));
+            return new PlayerScore(parts[0],Integer.parseInt(parts[1])); // construct new PlayerScore and return it
         }
     }
 
+    /* Read previous player scores from a file
+     *
+     * +----------------------+-----------------------+
+     * |       Variable       |      Description      |
+     * +----------------------+-----------------------+
+     * | BufferedReader input | input stream          |
+     * | String line          | line in file          |
+     * | PlayerScore score    | the score of a player |
+     * +----------------------+-----------------------+
+     */
     private void readScoresFromFile()
     {
         try
         {
-            BufferedReader input=new BufferedReader(new FileReader(SCORE_FILE_NAME));
+            BufferedReader input=new BufferedReader(new FileReader(SCORE_FILE_NAME)); // open input stream
             String line;
-            String currentCategory="DEFAULT";
-            while((line=input.readLine())!=null)
+            while((line=input.readLine())!=null) // read until end of file
             {
-                PlayerScore score=parseScore(line);
+                PlayerScore score=parseScore(line); // attempt to parse PlayerScore from line
                 if(score!=null)
                 {
-                    playerScores.add(score);
+                    playerScores.add(score); // add score to list of player scores
                 }
             }
-            input.close();
+            input.close(); // close input stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when reading from file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
 
@@ -749,32 +797,6 @@ public class WheelOfFortune {
         catch(IOException e)
         {
             e.printStackTrace();
-        }
-    }
-
-    private void displayHighScores() // only here for TESTING
-    {
-        for(int i=0;i<playerScores.size();++i)
-        {
-            console.println(playerScores.get(i).toString());
-        }
-    }
-
-    private void displayPhrases() // only here for TESTING
-    {
-        Set phraseCategories=phrases.keySet();
-        Iterator it=phraseCategories.iterator();
-        while(it.hasNext())
-        {
-            String categoryName=(String)it.next();
-
-            console.println("CURRENT CATEGORY: "+categoryName);
-            List phrasesInCategory=(List)phrases.get(categoryName);
-            for(int i=0;i<phrasesInCategory.size() && i<3;++i)
-            {
-                console.println((String)phrasesInCategory.get(i));
-            }
-            console.println();
         }
     }
 
