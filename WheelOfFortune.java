@@ -85,6 +85,11 @@ public class WheelOfFortune {
     public static final int CHAT_BOX_Y=INTERACTION_AREA_Y-CHAT_BOX_HEIGHT-10;
     public static final int CHAT_BOX_MAX_LINES=9;
 
+    // dimensions and positon of remaining letters bar
+    public static final int REMAINING_LETTERS_BAR_HEIGHT=CONSOLE_HEIGHT/20;
+    public static final int REMAINING_LETTERS_BAR_X=CHAT_BOX_X;
+    public static final int REMAINING_LETTERS_BAR_Y=CHAT_BOX_Y-CONSOLE_HEIGHT/8;
+
     // dimensions and position of sidebar
     public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
     public static final int SIDEBAR_WIDTH=CONSOLE_WIDTH/4;
@@ -257,34 +262,44 @@ public class WheelOfFortune {
 
     }
 
+    /*
+     * Draws the remaining letters which haven't been guessed yet
+     *
+     * +---------------+------------------------------------------------------+
+     * |   Variable    |                     Description                      |
+     * +---------------+------------------------------------------------------+
+     * | Set available | Set containing the letters that can still be guessed |
+     * | int letterX   | x-coordinate of letter                               |
+     * | int letterY   | y-coordinate of letter                               |
+     * +---------------+------------------------------------------------------+
+     */
     private void drawAvailableLetters(Set available)
     {
-        final int REMAINING_LETTERS_BAR_HEIGHT=CONSOLE_HEIGHT/20;
-        final int REMAINING_LETTERS_BAR_X=CHAT_BOX_X;
-        final int REMAINING_LETTERS_BAR_Y=CHAT_BOX_Y-CONSOLE_HEIGHT/8;
-
         console.setFont(new Font("Arial", Font.PLAIN, REMAINING_LETTERS_BAR_HEIGHT/2));
 
-        for(int i=0;i<26;++i)
+        for(int i=0;i<26;++i) // iterate over letters of alphabet
         {
-            int x,y;
-            if(i<13)
+            int letterX,letterY;
+            if(i<13) // first row of letters
             {
-                x=REMAINING_LETTERS_BAR_X+i*REMAINING_LETTERS_BAR_HEIGHT;
-                y=REMAINING_LETTERS_BAR_Y;
+                letterX=REMAINING_LETTERS_BAR_X+i*REMAINING_LETTERS_BAR_HEIGHT;
+                letterY=REMAINING_LETTERS_BAR_Y;
             }
-            else
+            else // second row of letters
             {
-                x=REMAINING_LETTERS_BAR_X+(i-13)*REMAINING_LETTERS_BAR_HEIGHT;
-                y=REMAINING_LETTERS_BAR_Y+REMAINING_LETTERS_BAR_HEIGHT;
+                letterX=REMAINING_LETTERS_BAR_X+(i-13)*REMAINING_LETTERS_BAR_HEIGHT;
+                letterY=REMAINING_LETTERS_BAR_Y+REMAINING_LETTERS_BAR_HEIGHT;
             }
+
+            // draw bubble for letter
             console.setColor(Color.LIGHT_GRAY);
-            console.fillOval(x-REMAINING_LETTERS_BAR_HEIGHT/3,y-REMAINING_LETTERS_BAR_HEIGHT*2/3,REMAINING_LETTERS_BAR_HEIGHT,REMAINING_LETTERS_BAR_HEIGHT);
+            console.fillOval(letterX-REMAINING_LETTERS_BAR_HEIGHT/3,letterY-REMAINING_LETTERS_BAR_HEIGHT*2/3,REMAINING_LETTERS_BAR_HEIGHT,REMAINING_LETTERS_BAR_HEIGHT);
+
             char c=(char)('A'+i);
-            if(available.contains(new Character(c)))
+            if(available.contains(new Character(c))) // only draw letter if it is available
             {
                 console.setColor(Color.BLACK);
-                console.drawString(Character.toString(c),x,y);
+                console.drawString(Character.toString(c),letterX,letterY); // draw letter
             }
         }
     }
