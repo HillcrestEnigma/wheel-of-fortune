@@ -561,7 +561,6 @@ public class WheelOfFortune {
                     playerScores.add(score);
                 }
             }
-            Collections.sort(playerScores,Collections.reverseOrder());
             input.close();
         }
         catch(IOException e)
@@ -691,6 +690,7 @@ public class WheelOfFortune {
         if (menuChoice == 0) {
             if (newRound()) return true;
         } else if (menuChoice == 1) {
+            leaderboard();
         } else if (menuChoice == 2) {
             instructions();
         } else {
@@ -1085,7 +1085,22 @@ public class WheelOfFortune {
         }
         drawPlayerInfo(1, player1Name, player1Balance, false, player1Winner);
         drawPlayerInfo(2, player2Name, player2Balance, false, player2Winner);
+        playerScores.add(new PlayerScore(player1Name, player1Balance));
+        playerScores.add(new PlayerScore(player2Name, player2Balance));
         return false;
+    }
+
+    public void leaderboard() {
+        console.clear();
+        Collections.sort(playerScores,Collections.reverseOrder());
+        console.println("Leaderboard\n");
+        PlayerScore playerScore;
+        for (int i=0; i<Math.min(playerScores.size(), 10); i++) {
+            playerScore = (PlayerScore)(playerScores.get(i));
+            console.println(playerScore.playerName + " - " + playerScore.score);
+        }
+        console.println("\nPlease press any key to continue.");
+        console.getChar();
     }
 
     public void instructions() {
@@ -1107,6 +1122,7 @@ public class WheelOfFortune {
     }
 
     public void goodbye() {
+        writeScoresToFile();
         console.clear();
         console.println("Thank you for spending some quality time with America's Game: Wheel of Fortune!\n");
         console.println(" - Game Programmers Paul Lee and Peter Ye.");
