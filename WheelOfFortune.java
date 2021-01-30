@@ -304,22 +304,39 @@ public class WheelOfFortune {
         }
     }
 
+    /* Draws the text for the wheel to a Graphics2D object
+     *
+     *
+     * +---------------------+--------------------------------+
+     * |      Variable       |          Description           |
+     * +---------------------+--------------------------------+
+     * | Graphics2D graphics | graphics object to be drawn on |
+     * | int radius          | radius of wheel                |
+     * | double angle        | angle of rotation              |
+     * | int SLICES          | number of wheel slices         |
+     * | String sliceStr     | the text of a wheel slice      |
+     * +---------------------+--------------------------------+
+     */
     private void drawWheelTextToGraphics(Graphics2D graphics,int radius, double angle)
     {
-        graphics.rotate(angle-Math.PI*0.3,radius,radius);
+        // rotate the graphics object to allow for rotated text
+        graphics.rotate(angle-Math.PI*0.3,radius,radius); 
+
         graphics.setFont(new Font("Arial",Font.BOLD,radius/12));
         final int SLICES=WHEEL_VALUES.length;
-        for(int i=0;i<SLICES;++i)
+        for(int i=0;i<SLICES;++i) // iterates over the slices of the wheel
         {
-            if(WHEEL_VALUES[i]==BANKRUPT)
+            if(WHEEL_VALUES[i]==BANKRUPT) // BANKRUPT is special because it uses white text, instead of the usual black text
             {
                 graphics.setColor(Color.WHITE);
             }
-            else
+            else // any other slice uses black text
             {
                 graphics.setColor(Color.BLACK);
             }
             String sliceStr;
+
+            // check if wheel value is a special constant
             if(WHEEL_VALUES[i]==BANKRUPT)
             {
                 sliceStr="BANKRUPT";
@@ -332,21 +349,33 @@ public class WheelOfFortune {
             {
                 sliceStr="COMMUNISM";
             }
-            else
+            else // wheel value is a regular price
             {
-                sliceStr="$"+WHEEL_VALUES[i];
+                sliceStr="$"+WHEEL_VALUES[i]; // append dollar sign to the front of the number
             }
-            graphics.drawString(sliceStr,radius/8,radius);
+
+            // draw the text for the current slice
+            graphics.drawString(sliceStr,radius/8,radius); 
+
+            // rotate the graphics object before drawing next slice
             graphics.rotate(2*Math.PI/SLICES,radius,radius);
         }
 
     }
 
+    /* Draws the spinning wheel for the game
+     *
+     * +-----------------------------+-------------------------------+
+     * |          Variable           |          Description          |
+     * +-----------------------------+-------------------------------+
+     * | double angle                | angle of rotation             |
+     * | Color[] WHEEL_COLORS        | colours of the wheel sections |
+     * | BufferedImage bufferedImage | image to draw wheel onto      |
+     * | Graphics2D graphics         | the graphics of bufferedImage |
+     * +-----------------------------+-------------------------------+
+     */
     private void drawWheel(double angle)
     {
-        int x = WHEEL_X;
-        int y = WHEEL_Y;
-        int radius = WHEEL_RADIUS;
 
         final Color[] WHEEL_COLORS={
             Color.LIGHT_GRAY,Color.ORANGE,Color.GREEN,Color.YELLOW,Color.PINK,
@@ -354,12 +383,12 @@ public class WheelOfFortune {
             Color.BLACK,Color.CYAN,Color.GREEN,Color.RED,Color.PINK
         };
         
-        BufferedImage bufferedImage=new BufferedImage(radius*2,radius*2,BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics=(Graphics2D)bufferedImage.getGraphics();
-        drawWheelBaseToGraphics(graphics,WHEEL_COLORS, radius, angle);
-        drawWheelTextToGraphics(graphics,radius,angle);
+        BufferedImage bufferedImage=new BufferedImage(WHEEL_RADIUS*2,WHEEL_RADIUS*2,BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics=(Graphics2D)bufferedImage.getGraphics(); // get graphics from bufferedImage
+        drawWheelBaseToGraphics(graphics,WHEEL_COLORS, WHEEL_RADIUS, angle); // draw wheel base to graphics
+        drawWheelTextToGraphics(graphics,WHEEL_RADIUS,angle); // draw wheel text to graphics
 
-        console.drawImage(bufferedImage,x-radius,y-radius,null);
+        console.drawImage(bufferedImage,WHEEL_X-WHEEL_RADIUS,WHEEL_Y-WHEEL_RADIUS,null); // draw the bufferedImage to the console window
     }
 
     private void drawLetterGrid(char[][] grid,Set available)
