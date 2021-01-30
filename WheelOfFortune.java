@@ -652,6 +652,21 @@ public class WheelOfFortune {
         console.getChar();
     }
 
+    public boolean mainMenu() {
+        String[] mainMenuChoices = {"New round", "Leaderboard", "Instructions", "Exit game"};
+        int menuChoice = acceptMenuChoice("Please select what you want to do.", mainMenuChoices);
+        console.clear();
+        if (menuChoice == 0) {
+            if (newRound()) return true;
+        } else if (menuChoice == 1) {
+        } else if (menuChoice == 2) {
+            instructions();
+        } else {
+            return true;
+        }
+        return false;
+    }
+
     public boolean newRound()
     {
         Set phraseCategoriesSet = phrases.keySet();
@@ -692,7 +707,7 @@ public class WheelOfFortune {
 
         List phrasesInCategory=(List)phrases.get(category);
         Collections.shuffle(phrasesInCategory, new Random());
-        int phraseIndex = 0;
+        int phraseIndex = -1;
         String phrase = "";
         String phraseType = "";
         char[] currentlyGuessed = new char[0];
@@ -706,14 +721,16 @@ public class WheelOfFortune {
         String currentPlayerName,otherPlayerName;
 
         int playerAction;
-        String[] playerTurnChoices = {"Guess letter", "Solve puzzle"};
+        String[] playerTurnChoices = {"Guess letter", "Solve puzzle", "Exit round"};
 
-        for(int loop=0;loop<NUMBER_OF_PHRASES;++loop)
+        int loop = 0;
+        while (loop < NUMBER_OF_PHRASES)
         {
             if (newPhrase) {
                 phraseIndex++;
-                phrase=(String)(phrasesInCategory.get(phraseIndex));
+                phrase=((String)(phrasesInCategory.get(phraseIndex)));
                 phraseType = (String)(phraseTypes.get(phrase));
+                phrase = phrase.toUpperCase();
                 System.out.println(phrase);
                 currentlyGuessed=new char[phrase.length()];
                 for(int i=0;i<phrase.length();++i)
@@ -748,6 +765,7 @@ public class WheelOfFortune {
                 );
 
                 newPhrase = false;
+                ++loop;
                 
                 drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category + " / " + phraseType);
 
@@ -858,7 +876,7 @@ public class WheelOfFortune {
                         if(phrase.charAt(i)==guess)
                         {
                             ++occurences;
-                            currentlyGuessed[i]=guess;
+                            currentlyGuessed[i]=phrase.charAt(i);
                         }
                     }
 
@@ -899,7 +917,7 @@ public class WheelOfFortune {
                     drawChatBox(chatBoxLines);
                     newPhrase = true;
                     break;
-                } else {
+                } else if (playerAction == 1) {
                     chatBoxLines.add(formatDialog(currentPlayerName, "I would like to solve the puzzle!"));
                     chatBoxLines.add(formatDialog(HOST_NAME, "Yes?"));
                     drawChatBox(chatBoxLines);
@@ -950,7 +968,7 @@ public class WheelOfFortune {
                         break;
                     }
 
-                    if(guess.equals(phrase))
+                    if(guess.equalsIgnoreCase(phrase))
                     {
                         chatBoxLines.add(formatDialog(HOST_NAME, "That's right!"));
                         chatBoxLines.add(formatDialog(currentPlayerName, "Oh my gosh!"));
@@ -992,6 +1010,8 @@ public class WheelOfFortune {
                         drawToInteractionArea("WRONG.");
                         break;
                     }
+                } else {
+                    return false;
                 }
             }
 
@@ -1033,12 +1053,39 @@ public class WheelOfFortune {
         return false;
     }
 
+    public void instructions() {
+        console.clear();
+        console.println("Wheel of Fortune\n");
+        console.println("Welcome to Wheel of Fortune, America's Game!\n");
+        console.println("In this game, you will be presented with 10 puzzles that consist of a mystery phrase or a word that you must attempt to guess what it is.");
+        console.println("Initially, we only show you the structure of the puzzle.");
+        console.println("When it's your turn you must first spin a wheel to determine the payout for your guess.");
+        console.println("You may guess a letter, and we will reveal where the letter you selected are placed on the puzzle.");
+        console.println("If your letter of choice is not on the puzzle, the other player gets the turn.");
+        console.println("If there are letters on the puzzle, there is a cash payout as determined by our formula.");
+        console.println("You may choose to guess the puzzle if you know what it is.");
+        console.println("It is encouraged to guess the phrase immidiately when you know it.");
+        console.println("After 10 puzzles, players with the most cash will win the game!");
+        console.println("Good Luck!");
+        console.println("\nPlease press any key to continue.");
+        console.getChar();
+    }
+
+    public void goodbye() {
+        console.clear();
+        console.println("Thank you for spending some quality time with America's Game: Wheel of Fortune!\n");
+        console.println(" - Game Programmers Paul Lee and Peter Ye.");
+    }
+
     public static void main(String[] args) {
         WheelOfFortune game = new WheelOfFortune();
-        game.newRound();
 
-        while (game.newRound()) {    
-            game.newRound();
+        boolean exitGame = false;
+
+        while (!exitGame) {    
+            exitGame = game.mainMenu();
         }
+
+        game.goodbye();
     }
 }
