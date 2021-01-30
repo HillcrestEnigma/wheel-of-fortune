@@ -50,71 +50,98 @@ class PlayerScore implements Comparable // class to store the score of a player 
 public class WheelOfFortune {
     private Console console; // console window
 
-    public static final int NUMBER_OF_PHRASES=10;
+    public static final int NUMBER_OF_PHRASES=10; // number of phrases per round
 
-    public static final int CONSOLE_WIDTH=1024;
+    // dimensions of console
+    public static final int CONSOLE_WIDTH=1024; 
     public static final int CONSOLE_HEIGHT=768;
+
+    // font size for console
     public static final int FONT_SIZE=20;
 
+    // dimensions and position of letter grid
     public static final int LETTER_GRID_X = 10;
     public static final int LETTER_GRID_Y = 10;
     public static final int LETTER_GRID_CELL_SIZE = 30;
     public static final int LETTER_GRID_ROWS = 8;
     public static final int LETTER_GRID_COLS = 25;
 
+    // dimensions and position of fullscreen letter grid
     public static final int FS_LETTER_GRID_X = 10;
     public static final int FS_LETTER_GRID_Y = 10;
     public static final int FS_LETTER_GRID_CELL_SIZE = 50;
     public static final int FS_LETTER_GRID_ROWS = 15;
     public static final int FS_LETTER_GRID_COLS = 20;
 
+    // y-coordinate of interaction area
     public static final int INTERACTION_AREA_Y=CONSOLE_HEIGHT*3/4;
 
+    // dimensions and position of chat box
     public static final int CHAT_BOX_WIDTH=CONSOLE_WIDTH/2;
     public static final int CHAT_BOX_HEIGHT=CONSOLE_HEIGHT/4;
     public static final int CHAT_BOX_X=10;
     public static final int CHAT_BOX_Y=INTERACTION_AREA_Y-CHAT_BOX_HEIGHT-10;
     public static final int CHAT_BOX_MAX_LINES=9;
 
+    // dimensions and position of sidebar
     public static final int SIDEBAR_X=CONSOLE_WIDTH*3/4;
     public static final int SIDEBAR_WIDTH=CONSOLE_WIDTH/4;
     public static final int SIDEBAR_ITEM_HEIGHT = 50;
 
+    // coordinates of interaction area (in rows and columns)
     public final int INTERACTION_AREA_ROW;
     public final int INTERACTION_AREA_COL;
 
+    // coordinates and radius of wheel
     public static final int WHEEL_X=SIDEBAR_X+SIDEBAR_WIDTH;
     public static final int WHEEL_Y=0;
     public static final int WHEEL_RADIUS=SIDEBAR_WIDTH;
+
+    // speed and acceleration of wheel
     public static final double WHEEL_INIT_VEL_LOWER_BOUND=Math.PI*3;
     public static final double WHEEL_INIT_VEL_UPPER_BOUND=Math.PI*7;
     public static final double WHEEL_ACCEL=-Math.PI*2;
 
+    // coordinates of player list
     public static final int PLAYER_LIST_X = SIDEBAR_X;
     public static final int PLAYER_LIST_Y = CONSOLE_HEIGHT-SIDEBAR_WIDTH-(int)(SIDEBAR_ITEM_HEIGHT*4.5);
 
+    // coordinates of category indicator
     public static final int CATEGORY_INDICATOR_X = SIDEBAR_X;
     public static final int CATEGORY_INDICATOR_Y = PLAYER_LIST_Y+(int)(SIDEBAR_ITEM_HEIGHT*3.5);
 
+    // maximum length of player name
     public static final int PLAYER_NAME_MAX_LEN=10;
 
+    // name of file storing phrases
     public static final String PHRASE_FILE_NAME="phrases.wof_data";
+
+    // name of file storing scores
     public static final String SCORE_FILE_NAME="scores.wof";
 
+    // name of the host of the game
     public static final String HOST_NAME="Host";
 
+    // constant values for the special sections of the wheel
     private static final int LOSE_TURN=-1;
     private static final int BANKRUPT=-2;
     private static final int COMMUNISM=-3;
 
+    // prices of the sections of the wheel
     private static final int[] WHEEL_VALUES={
         LOSE_TURN,2500,700,600,550,
         BANKRUPT,600,500,COMMUNISM,800,
         LOSE_TURN,800,500,900,500};
 
-    private Map phrases;
-    private Map phraseTypes;
-    private List playerScores;
+    private Map phrases; // stores the phrases by category (open source, ICS, pandemic, etc)
+                         // key = String (category name)
+                         // value = List of Strings (list of phrases within a category) 
+
+    private Map phraseTypes; // stores the type of each phrase (noun, verb, adjective, etc)
+                             // key = String (phrase name)
+                             // value = String (type name)
+
+    private List playerScores; // list of player scores (PlayerScore objects)
 
     // Class Constructor
     public WheelOfFortune() {
