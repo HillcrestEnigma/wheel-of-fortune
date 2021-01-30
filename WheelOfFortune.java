@@ -21,6 +21,11 @@
  * https://docs.oracle.com/javase/9/docs/api/java/util/Collections.html
  * https://docs.oracle.com/javase/9/docs/api/java/awt/image/BufferedImage.html
  * https://docs.oracle.com/javase/9/docs/api/java/awt/Graphics2D.html
+ *
+ * https://www.geeksforgeeks.org/collections-shuffle-java-examples/
+ * https://www.geeksforgeeks.org/java-touppercase-examples/
+ * https://stackoverflow.com/questions/886955/how-do-i-break-out-of-nested-loops-in-java
+ * https://hsa.larry.science/
  */
 
 import java.awt.*;
@@ -1164,7 +1169,7 @@ public class WheelOfFortune {
                     Thread.sleep(100);
                 } catch (Exception e) {}
                 // Calculate the initial speed of the wheel
-                spd = velMath.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
+                spd = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
                 while (spd > 0) {
                     // Render the wheel
                     drawWheel(angle);
