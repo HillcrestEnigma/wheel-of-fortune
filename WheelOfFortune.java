@@ -24,28 +24,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
-class PlayerScore implements Comparable // class to store the score of a player and their name
-{
-    public final String playerName; // name of player
-    public final int score; // player's score
-    public PlayerScore(String pn,int sc)
-    {
-        score=sc;
-        playerName=pn;
-    }
-    public int compareTo(Object o) // compares two PlayerScores (used when sorting a list of PlayerScores)
-    {
-        PlayerScore other=(PlayerScore)o;
-        if(score==other.score) // scores equal; compare names
-        {
-            return playerName.compareTo(other.playerName);
-        }
-        else // compare scores
-        {
-            return new Integer(score).compareTo(new Integer(other.score));
-        }
-    }
-}
+
 
 public class WheelOfFortune {
     private Console console; // console window
@@ -799,7 +778,7 @@ public class WheelOfFortune {
         int player2Balance = 0;
         chatBoxLines.add(formatDialog(player2Name,"I'm "+player2Name+" and I know I will win!"));
         chatBoxLines.add(formatDialog(HOST_NAME,"You surely sound confident!"));
-	drawChatBox(chatBoxLines);
+        drawChatBox(chatBoxLines);
 
         List phrasesInCategory=(List)phrases.get(category);
         Collections.shuffle(phrasesInCategory);
@@ -827,7 +806,6 @@ public class WheelOfFortune {
                 phrase=((String)(phrasesInCategory.get(phraseIndex)));
                 phraseType = (String)(phraseTypes.get(phrase));
                 phrase = phrase.toUpperCase();
-                System.out.println(phrase);
                 currentlyGuessed=new char[phrase.length()];
                 for(int i=0;i<phrase.length();++i)
                 {
@@ -1212,3 +1190,27 @@ public class WheelOfFortune {
         game.goodbye();
     }
 }
+
+class PlayerScore implements Comparable // class to store the score of a player and their name
+{
+    public final String playerName; // name of player
+    public final int score; // player's score
+    public PlayerScore(String pn,int sc)
+    {
+        score=sc;
+        playerName=pn;
+    }
+    public int compareTo(Object o) // compares two PlayerScores (used when sorting a list of PlayerScores)
+    {
+        PlayerScore other=(PlayerScore)o;
+        if(score==other.score) // scores equal; compare names
+        {
+            return playerName.compareTo(other.playerName);
+        }
+        else // compare scores
+        {
+            return new Integer(score).compareTo(new Integer(other.score));
+        }
+    }
+}
+
