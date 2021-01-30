@@ -50,6 +50,8 @@ class PlayerScore implements Comparable // class to store the score of a player 
 public class WheelOfFortune {
     private Console console; // console window
 
+    public static final String PROGRAM_NAME="Wheel of Fortune 1.0"; // name of the program
+
     public static final int NUMBER_OF_PHRASES=10; // number of phrases per round
 
     // dimensions of console
@@ -146,27 +148,33 @@ public class WheelOfFortune {
     // Class Constructor
     public WheelOfFortune() {
         // create a test console to calculate number of pixels per row and column
-        int pxPerRow,pxPerCol;
         Console tmpConsole = new Console(1,1,FONT_SIZE);
-        pxPerRow=tmpConsole.getHeight();
-        pxPerCol=tmpConsole.getWidth();
-        tmpConsole.close();
 
+        int pxPerRow=tmpConsole.getHeight(); // number of pixels per console row
+        int pxPerCol=tmpConsole.getWidth(); // number of pixels per console column
+        tmpConsole.close(); // close test console
+
+        // number of rows and columns in main console
         int consoleRows=CONSOLE_HEIGHT/pxPerRow;
         int consoleCols=CONSOLE_WIDTH/pxPerCol;
 
+        // calculate row number of interaction area
         INTERACTION_AREA_ROW=INTERACTION_AREA_Y/pxPerRow+1;
         INTERACTION_AREA_COL=1;
 
-        console=new Console(consoleRows,consoleCols,FONT_SIZE);
+        // create main console with custom title
+        console=new Console(consoleRows,consoleCols,FONT_SIZE,PROGRAM_NAME);
 
+        // initialize data structures
         phrases=new HashMap();
         playerScores=new ArrayList();
         phraseTypes=new HashMap();
 
+        // read phrases and previous scores from file
         readPhrasesFromFile();
         readScoresFromFile();
 
+        // draw the splash screen animation
         drawSplashScreen();
     }
 
