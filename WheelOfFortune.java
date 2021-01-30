@@ -833,7 +833,7 @@ public class WheelOfFortune {
                 
                 drawGenericSidebarWidget(CATEGORY_INDICATOR_X, CATEGORY_INDICATOR_Y+SIDEBAR_ITEM_HEIGHT, category + " / " + phraseType);
 
-                chatBoxLines.add(formatDialog(HOST_NAME, "New phrase!"));
+                chatBoxLines.add(formatDialog(HOST_NAME, "New puzzle!"));
                 chatBoxLines.add(formatDialog(HOST_NAME, "This one is a " + phraseType + "."));
                 drawChatBox(chatBoxLines);
             }
@@ -936,10 +936,10 @@ public class WheelOfFortune {
                         }
                         else
                         {
-                            chatBoxLines.add(formatDialog(HOST_NAME, "That has been guessed already bruhhh"));
+                            if ('A' > guess || guess > 'Z') chatBoxLines.add(formatDialog(HOST_NAME, "That is an invalid letter."));
+                            else chatBoxLines.add(formatDialog(HOST_NAME, "That has been guessed already bruhhh"));
                             chatBoxLines.add(formatDialog(HOST_NAME, "Since I'm a nice person, I'll let you try again."));
                             drawChatBox(chatBoxLines);
-                            guess=console.getChar();
                         }
                     }
                     availableLetters.remove(new Character(guess));
@@ -1102,14 +1102,12 @@ public class WheelOfFortune {
         else if (player1Balance < player2Balance) player1Winner = false;
 
         if (player1Winner && player2Winner) {
-            drawToInteractionArea("Game is OVER. It's a TIE!");
             chatBoxLines.add(formatDialog(HOST_NAME, "Oh my... We have a tie here!"));
             chatBoxLines.add(formatDialog(HOST_NAME, "Contestants, please show your good sportsmanship!"));
             chatBoxLines.add(formatDialog(player1Name, "It was a pleasure playing with you!"));
             chatBoxLines.add(formatDialog(player2Name, "We both did amazing!"));
             drawChatBox(chatBoxLines);
         } else if (player1Winner) {
-            drawToInteractionArea("Game is OVER. " + player1Name + " is the winner!");
             chatBoxLines.add(formatDialog(HOST_NAME, "Congratulations " + player1Name + ", you are the winner tonight!"));
             chatBoxLines.add(formatDialog(player1Name, "Yayyyy!"));
             chatBoxLines.add(formatDialog(player1Name, player2Name + ", you were an amazing player too!"));
@@ -1117,7 +1115,6 @@ public class WheelOfFortune {
             chatBoxLines.add(formatDialog(player2Name, "You are the winner tonight!"));
             drawChatBox(chatBoxLines);
         } else {
-            drawToInteractionArea("Game is OVER. " + player2Name + " is the winner!");
             chatBoxLines.add(formatDialog(HOST_NAME, "Congratulations " + player2Name + ", you won tonight!"));
             chatBoxLines.add(formatDialog(player2Name, "Really?"));
             chatBoxLines.add(formatDialog(player1Name, "Congraultations, " + player2Name + ", you were amazing!"));
@@ -1128,6 +1125,7 @@ public class WheelOfFortune {
         drawPlayerInfo(2, player2Name, player2Balance, false, player2Winner);
         playerScores.add(new PlayerScore(player1Name, player1Balance));
         playerScores.add(new PlayerScore(player2Name, player2Balance));
+        pauseProgram();
         return false;
     }
 
