@@ -8,6 +8,19 @@
 /* Program Purpose: Recreate the Wheel of Fortune game in Ready to Program
  * Variables:
  * - Console console: reference to console
+ *
+ * Citations:
+ * https://stackoverflow.com/questions/22839618/how-to-get-pixel-color-from-graphics-g
+ * https://stackoverflow.com/questions/14124593/how-to-rotate-graphics-in-java
+ * https://stackoverflow.com/questions/18073590/sort-list-in-reverse-in-order
+ * 
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/List.html
+ * https://docs.oracle.com/javase/9/docs/api/java/lang/Comparable.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Set.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Map.html
+ * https://docs.oracle.com/javase/9/docs/api/java/util/Collections.html
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/image/BufferedImage.html
+ * https://docs.oracle.com/javase/9/docs/api/java/awt/Graphics2D.html
  */
 
 import java.awt.*;
@@ -22,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
-
 
 
 public class WheelOfFortune {
@@ -370,12 +381,14 @@ public class WheelOfFortune {
         console.drawImage(bufferedImage,WHEEL_X-WHEEL_RADIUS,WHEEL_Y-WHEEL_RADIUS,null); // draw the bufferedImage to the console window
     }
 
+    // overload of drawLetterGrid that also draws the available letters
     private void drawLetterGrid(char[][] grid,Set available)
     {
         drawLetterGrid(grid,LETTER_GRID_X,LETTER_GRID_Y,LETTER_GRID_CELL_SIZE);
         drawAvailableLetters(available);
     }
 
+    // wrapper around drawLetterGrid to make it take up the entire screen
     private void drawFullScreenLetterGrid(char[][] grid)
     {
         drawLetterGrid(grid,
@@ -383,83 +396,143 @@ public class WheelOfFortune {
                 FS_LETTER_GRID_Y,
                 FS_LETTER_GRID_CELL_SIZE);
     }
+
+    /* Draws grid of letters for the game
+     *
+     * +---------------+----------------------+
+     * |   Variable    |     Description      |
+     * +---------------+----------------------+
+     * | char[][] grid | grid of letters      |
+     * | int x         | x-coordinate of grid |
+     * | int y         | y-coordinate of grid |
+     * +---------------+----------------------+
+     */
     private void drawLetterGrid(char[][] grid,int x, int y,int squareSize) {
         console.setFont(new Font("Arial", Font.PLAIN, squareSize/2));
         Color emptyColor = new Color(153, 204, 255);
         Color filledColor = new Color(242, 242, 242);
-        for (int i=0; i<grid[0].length; i++) {
-            for (int j=0; j<grid.length; j++) {
-                if (grid[j][i] == 0) console.setColor(emptyColor);
-                else console.setColor(filledColor);
+        for (int i=0; i<grid[0].length; i++) { // rows of grid
+            for (int j=0; j<grid.length; j++) { // columns of grid
+                if (grid[j][i] == 0) console.setColor(emptyColor); // grid cell is empty
+                else console.setColor(filledColor); // grid cell not empty
                 if (grid[j][i] == '_') grid[j][i] = ' ';
-                console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1);
-                if(grid[j][i]!=0)
+                console.fillRect(x + squareSize*i, y + squareSize*j, squareSize-1, squareSize-1); // draw grid cell rectangle
+                if(grid[j][i]!=0) // if grid cell not empty
                 {
                     console.setColor(Color.black);
-                    console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65)));
+                    console.drawString("" + grid[j][i], (int)(x+squareSize*(i+0.3)), (int)(y + squareSize*(j+0.65))); // draw letter
                 }
             }
         }
     }
 
+    /* Converts a string to a character grid
+     *
+     * +---------------+----------------------------------+
+     * |   Variable    |           Description            |
+     * +---------------+----------------------------------+
+     * | String str    | String to be processed           |
+     * | int rows      | number of rows                   |
+     * | int cols      | number of columns                |
+     * | char[][] grid | character grid                   |
+     * | words         | String split into separate words |
+     * +---------------+----------------------------------+
+     */
     private char[][] stringToCharacterGrid(String str,int rows,int cols)
     {
         char[][] grid=new char[rows][cols];
-        String[] words=str.split("\0");
-        int currentRow=0,currentCol=0;
-        for(int i=0;i<words.length;++i)
+        String[] words=str.split("\0"); // split str
+        int currentRow=0,currentCol=0; // current position in grid
+        for(int i=0;i<words.length;++i) // iterate over the words
         {
             String currentWord=words[i].toUpperCase();
             while(currentRow<rows)
             {
-                if(cols-currentCol >= currentWord.length())
+                if(cols-currentCol >= currentWord.length()) // check if there is enough space in row
                 {
-                    for(int j=0;j<currentWord.length();++j)
+                    for(int j=0;j<currentWord.length();++j) // copy word over to grid
                     {
-                        grid[currentRow][currentCol+j]=currentWord.charAt(j);
+                        grid[currentRow][currentCol+j]=currentWord.charAt(j); // copy a character
                     }
                     currentCol+=currentWord.length()+1;
                     break;
                 }
                 else
                 {
-                    ++currentRow;
-                    currentCol=0;
+                    ++currentRow; // increment row
+                    currentCol=0; // move to first column
                 }
             }
         }
-        return grid;
+        return grid; // return newly created grid
     }
 
-    
-
+    /*
+     * Draws a button, identified by a key which the user can presson their keyboard
+     * +-------------------+---------------------------------------+
+     * |     Variable      |              Description              |
+     * +-------------------+---------------------------------------+
+     * | int x             | x-coordinate of button                |
+     * | int y             | y-coordinate of button                |
+     * | String action     | text on button                        |
+     * | char key          | button identifier                     |
+     * | boolean activated | whether the button has been activated |
+     * +-------------------+---------------------------------------+
+     */
     private void drawButton(int x, int y, String action, char key, boolean activated) {
         console.setColor(Color.black);
-        console.drawRect(x, y, 200, 50);
+        console.drawRect(x, y, 200, 50); // button border
         console.drawRect(x+150, y, 50, 50);
-        if (activated) console.setColor(new Color(204, 255, 204));
+        if (activated) console.setColor(new Color(204, 255, 204)); // change button colour if activated
         else console.setColor(Color.white);
         console.fillRect(x+1, y+1, 149, 49);
         console.fillRect(x+151, y+1, 49, 49);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 20));
-        console.drawString(action, (int)(x+16), (int)(y+33));
-        console.drawString("" + key, (int)(x+168), (int)(y+33));
+        console.drawString(action, (int)(x+16), (int)(y+33)); // draw button action name
+        console.drawString("" + key, (int)(x+168), (int)(y+33)); // draw button key
     }
 
+    /* Draws the host of the game
+     *
+     * +----------+----------------------+
+     * | Variable |     Description      |
+     * +----------+----------------------+
+     * | int x    | x-coordinate of host |
+     * | int y    | y-coordinate of host |
+     * +----------+----------------------+
+     */
     private void drawHost(int x, int y) {
         console.setColor(Color.black);
-        console.fillOval(x, y, 50, 50);
-        console.fillRect(x+5, y+45, 40, 100);
+        console.fillOval(x, y, 50, 50); // circular head
+        console.fillRect(x+5, y+45, 40, 100); // rectangular body
     }
 
+    /* Draws the platform which the host stands on
+     *
+     * +----------+--------------------------+
+     * | Variable |       Description        |
+     * +----------+--------------------------+
+     * | int x    | x-coordinate of platform |
+     * | int y    | y-coordinate of platform |
+     * +----------+--------------------------+
+     */
     private void drawHostPlatform(int x, int y) {
         console.setColor(Color.gray);
         console.fillOval(x-25, y+120, 100, 50);
     }
 
-    
-
+    /* Draws a generic sidebar widget
+     *
+     * +-------------+------------------------------+
+     * |  Variable   |         Description          |
+     * +-------------+------------------------------+
+     * | int x       | x-coordinate of widget       |
+     * | int y       | y-coordinate of widget       |
+     * | String text | text displayed on widget     |
+     * | Color color | background colour for widget |
+     * +-------------+------------------------------+
+     */
     private void drawGenericSidebarWidget(int x, int y, String text, Color color) {
         console.setColor(Color.black);
         console.drawRect(x, y, SIDEBAR_WIDTH, SIDEBAR_ITEM_HEIGHT);
@@ -470,26 +543,51 @@ public class WheelOfFortune {
         console.drawString(text, (int)(x+16), (int)(y+SIDEBAR_ITEM_HEIGHT*33/50.0));
     }
 
+    // overload of drawGenericSidebarWidget() using default colour
     private void drawGenericSidebarWidget(int x, int y, String text) {
         drawGenericSidebarWidget(x, y, text, new Color(255, 204, 204));
     }
 
+    // wrapper around drawGenericSidebarWidget() to draw the heading for the sidebar
     private void drawSidebarHeading(int x, int y, String text) {
         drawGenericSidebarWidget(x, y, text, new Color(255, 153, 102));
     }
 
+    /* Draws the info (balance, name, current turn, etc) of a player
+     *
+     * +---------------------+------------------------------+
+     * |      Variable       |         Description          |
+     * +---------------------+------------------------------+
+     * | int playerID        | ID of player (either 1 or 2) |
+     * | String name         | player's name                |
+     * | int balance         | player's balance             |
+     * | boolean currentTurn | is it the player's turn      |
+     * | boolean isWinner    | did the player win           |
+     * +---------------------+------------------------------+
+     */
     private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn, boolean isWinner) {
         Color color;
+        // change color based on player status
         if (currentTurn) color = new Color(255, 204, 102);
         else if (isWinner) color = new Color(204, 255, 204);
         else color = new Color(255, 204, 204);
         drawGenericSidebarWidget(PLAYER_LIST_X, PLAYER_LIST_Y + SIDEBAR_ITEM_HEIGHT*playerID, name + " - $" + balance, color);
     }
 
+    // overload of drawPlayerInfo() using default of false for isWinner
     private void drawPlayerInfo(int playerID, String name, int balance, boolean currentTurn) {
         drawPlayerInfo(playerID, name, balance, currentTurn, false);
     }
 
+    /* Draws the scrolling chat box
+     *
+     * +----------------+--------------------------------------+
+     * |    Variable    |             Description              |
+     * +----------------+--------------------------------------+
+     * | List lines     | List of lines                        |
+     * | int topMessage | index of top message to be displayed |
+     * +----------------+--------------------------------------+
+     */
     private void drawChatBox(List lines) {
         console.setColor(Color.black);
         console.drawRect(CHAT_BOX_X, CHAT_BOX_Y, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
@@ -497,12 +595,13 @@ public class WheelOfFortune {
         console.fillRect(CHAT_BOX_X+1, CHAT_BOX_Y+1, CHAT_BOX_WIDTH-1, CHAT_BOX_HEIGHT-1);
         console.setColor(Color.black);
         console.setFont(new Font("Arial", Font.PLAIN, 16));
-        int topMessage = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES);
-        for (int i = 0; i<Math.min(CHAT_BOX_MAX_LINES, lines.size()); i++) {
-            console.drawString((String)lines.get(i + topMessage), CHAT_BOX_X+16, CHAT_BOX_Y+20 + (i)*20);
+        int topMessage = Math.max(0, lines.size()-CHAT_BOX_MAX_LINES); // find top message
+        for (int i = 0; i<Math.min(CHAT_BOX_MAX_LINES, lines.size()); i++) { // iterate over messages
+            console.drawString((String)lines.get(i + topMessage), CHAT_BOX_X+16, CHAT_BOX_Y+20 + (i)*20); // draw message
         }
     }
 
+    // Draws the sidebar
     private void drawSidebar() {
         console.setColor(new Color(255, 102, 102));
         console.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, INTERACTION_AREA_Y);
@@ -519,272 +618,357 @@ public class WheelOfFortune {
         console.fillOval(WHEEL_X - WHEEL_RADIUS*13/16, WHEEL_Y + WHEEL_RADIUS*13/16, 10, 10);
     }
 
+    // Parses a category marker from a String line
     private String parseCategoryMarker(String line)
     {   // returns the category name if line is a category marker
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(!line.startsWith("- ") && line.charAt(line.length()-1)==':')
         {
-            return line.substring(0,line.length()-1);
+            return line.substring(0,line.length()-1); // remove trailing ':'
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    // Parses a type marker from a String line
     private String parseTypeMarker(String line)
-    {   // returns the phrase if line is a phrase
+    {   // returns the type marker if line is a type marker
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(line.startsWith("- ") && line.charAt(line.length()-1) == ':')
         {
-            return line.substring(2,line.length()-1).trim();
+            return line.substring(2,line.length()-1).trim(); // remove leading '-' and trailing ':'
 
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    // Parses a phrase from a String line
     private String parsePhrase(String line)
     {   // returns the phrase if line is a phrase
         // returns an empty string otherwise
         if(line.length()==0)
         {
-            return "";
+            return ""; // return empty string
         }
         else if(line.startsWith("- "))
         {
-            return line.substring(2,line.length()).trim();
-
+            return line.substring(2,line.length()).trim(); // remove leading '-'
         }
         else
         {
-            return "";
+            return ""; // return empty string
         }
     }
 
+    /* Adds a phrase to the phrase database
+     *
+     * +----------------------+-------------------------------+
+     * |       Variable       |          Description          |
+     * +----------------------+-------------------------------+
+     * | String phrase        | the phrase                    |
+     * | String category      | category of phrase            |
+     * | String type          | type of phrase                |
+     * | List categoryPhrases | list of phrases in a category |
+     * +----------------------+-------------------------------+
+     */
     private void addPhraseToMap(String phrase,String category,String type)
     {
-        if(!phrases.containsKey(category))
+        if(!phrases.containsKey(category)) // initialize category if it doesn't exist yet
         {
-            phrases.put(category,new ArrayList());
+            phrases.put(category,new ArrayList()); // initialize empty ArrayList 
         }
-        List categoryPhrases=(List)phrases.get(category);
-        categoryPhrases.add(phrase);
-        phraseTypes.put(phrase, type);
+        List categoryPhrases=(List)phrases.get(category); // fetch list of phrases in category
+        categoryPhrases.add(phrase); // add phrase to category
+        phraseTypes.put(phrase, type); // add phrase to phraseTypes
     }
     
+    /* Reads the phrases from phrase file
+     * 
+     * +------------------------+----------------------------------------+
+     * |        Variable        |              Description               |
+     * +------------------------+----------------------------------------+
+     * | BufferedReader input   | input stream                           |
+     * | String line            | line in file                           |
+     * | String currentCategory | the category currently being processed |
+     * | String currentType     | the type currently being processed     |
+     * +------------------------+----------------------------------------+
+     */
     private void readPhrasesFromFile()
     {
         try
         {
-            BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME));
+            BufferedReader input=new BufferedReader(new FileReader(PHRASE_FILE_NAME)); // open input stream
             String line;
+            // initialize category and type
             String currentCategory="DEFAULT";
             String currentType="DEFAULT";
-            while((line=input.readLine())!=null)
+            while((line=input.readLine())!=null) // keep on reading until end of file
             {
                 line=line.trim();
-                String categoryMarker=parseCategoryMarker(line);
+
+                //attempt to parse a category marker and a type marker from line
+                String categoryMarker=parseCategoryMarker(line); 
                 String typeMarker=parseTypeMarker(line);
-                if(categoryMarker.length()>0)
+                if(categoryMarker.length()>0) // category marker found
                 {
                     currentCategory=categoryMarker;
                 }
-                else if (typeMarker.length()>0)
+                else if (typeMarker.length()>0) // type marker found
                 {
                     currentType=typeMarker;
                 }
-                else {
+                else { // phrase found
                     String phrase=parsePhrase(line);
                     if(phrase.length()>0)
                     {
-                        addPhraseToMap(phrase,currentCategory,currentType);
+                        addPhraseToMap(phrase,currentCategory,currentType); // add phrase to phrase database
                     }
                 }
             }
-            input.close();
+            input.close(); // close input stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when reading from file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
 
+    // Parse a PlayerScore from a line
     private PlayerScore parseScore(String line)
     {
-        line=line.trim();
-        String[] parts=line.split("\\s*,\\s*");
-        if(parts.length!=2)
+        line=line.trim(); // trim the line
+        String[] parts=line.split("\\s*,\\s*"); // split line into parts
+        if(parts.length!=2) // not a PlayerScore; return null
         {
             return null;
         }
-        else
+        else // is a PlayerScore
         {
-            return new PlayerScore(parts[0],Integer.parseInt(parts[1]));
+            return new PlayerScore(parts[0],Integer.parseInt(parts[1])); // construct new PlayerScore and return it
         }
     }
 
+    /* Read previous player scores from a file
+     *
+     * +----------------------+-----------------------+
+     * |       Variable       |      Description      |
+     * +----------------------+-----------------------+
+     * | BufferedReader input | input stream          |
+     * | String line          | line in file          |
+     * | PlayerScore score    | the score of a player |
+     * +----------------------+-----------------------+
+     */
     private void readScoresFromFile()
     {
         try
         {
-            BufferedReader input=new BufferedReader(new FileReader(SCORE_FILE_NAME));
+            BufferedReader input=new BufferedReader(new FileReader(SCORE_FILE_NAME)); // open input stream
             String line;
-            String currentCategory="DEFAULT";
-            while((line=input.readLine())!=null)
+            while((line=input.readLine())!=null) // read until end of file
             {
-                PlayerScore score=parseScore(line);
+                PlayerScore score=parseScore(line); // attempt to parse PlayerScore from line
                 if(score!=null)
                 {
-                    playerScores.add(score);
+                    playerScores.add(score); // add score to list of player scores
                 }
             }
-            input.close();
+            input.close(); // close input stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when reading from file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
 
+    /* Writes player scores to file
+     *
+     * +-------------------------+-----------------------+
+     * |        Variable         |      Description      |
+     * +-------------------------+-----------------------+
+     * | PrintWriter output      | output stream         |
+     * | PlayerScore playerScore | the score of a player |
+     * +-------------------------+-----------------------+
+     */
     private void writeScoresToFile()
     {
         try
         {
-            PrintWriter output=new PrintWriter(new FileWriter(SCORE_FILE_NAME));
-            for(int i=0;i<playerScores.size();++i)
+            PrintWriter output=new PrintWriter(new FileWriter(SCORE_FILE_NAME)); // open output stream
+            for(int i=0;i<playerScores.size();++i) // iterate over player scores
             {
                 PlayerScore playerScore=(PlayerScore)playerScores.get(i);
-                output.println(playerScore.playerName+","+playerScore.score);
+                output.println(playerScore.playerName+","+playerScore.score); // output player score to file
             }
-            output.close();
+            output.close(); // close output stream
         }
-        catch(IOException e)
+        catch(IOException e) // exception occurred when writing to file
         {
-            e.printStackTrace();
+            e.printStackTrace(); // display stack trace
         }
     }
-
-    private void displayHighScores() // only here for TESTING
-    {
-        for(int i=0;i<playerScores.size();++i)
-        {
-            console.println(playerScores.get(i).toString());
-        }
-    }
-
-    private void displayPhrases() // only here for TESTING
-    {
-        Set phraseCategories=phrases.keySet();
-        Iterator it=phraseCategories.iterator();
-        while(it.hasNext())
-        {
-            String categoryName=(String)it.next();
-
-            console.println("CURRENT CATEGORY: "+categoryName);
-            List phrasesInCategory=(List)phrases.get(categoryName);
-            for(int i=0;i<phrasesInCategory.size() && i<3;++i)
-            {
-                console.println((String)phrasesInCategory.get(i));
-            }
-            console.println();
-        }
-    }
-
+    
+    /* formats a dialog message
+     *
+     * +----------------+-----------------+
+     * |    Variable    |   Description   |
+     * +----------------+-----------------+
+     * | String speaker | name of speaker |
+     * | String message | message text    |
+     * +----------------+-----------------+
+     */
     public String formatDialog(String speaker,String message)
     {
         return speaker+": "+message;
     }
 
+    // draws the interaction area rectangle
     public void drawInteractionArea()
     {
         console.setColor(Color.LIGHT_GRAY);
         console.fillRect(0,INTERACTION_AREA_Y,CONSOLE_WIDTH,CONSOLE_HEIGHT-INTERACTION_AREA_Y);
     }
+
+    // draws a String str to the interaction area
     public void drawToInteractionArea(String str)
     {
-        drawInteractionArea();
-        console.setCursor(INTERACTION_AREA_ROW+1,INTERACTION_AREA_COL);
-        console.print(str);
+        drawInteractionArea(); // draw interaction area rectangle
+        console.setCursor(INTERACTION_AREA_ROW+1,INTERACTION_AREA_COL); // move cursor
+        console.print(str); // print str
     }
+
+    /* accepts a string from the interaction area
+     *
+     * +-----------------+--------------------------+
+     * |    Variable     |       Description        |
+     * +-----------------+--------------------------+
+     * | String prompt   | prompt given to the user |
+     * | int lengthLimit | maximum length of input  |
+     * | String answer   | user input               |
+     * +-----------------+--------------------------+
+     */
     public String acceptString(String prompt,int lengthLimit)
     {
-        while(true)
+        while(true) // loop until user enters a valid string
         {
-            drawToInteractionArea(prompt);
-            String answer=console.readLine();
-            if(answer.length()>lengthLimit)
+            drawToInteractionArea(prompt); // draw prompt to interaction area
+            String answer=console.readLine(); // read string from console
+            if(answer.length()>lengthLimit) // answer too long; try again
             {
                 console.println("The string which you entered was too long! Please try again.\nPress any key to continue ...");
-                console.getChar();
+                console.getChar(); // wait for user to press key
                 continue;
             }
-            else
+            else // answer is valid; return answer
             {
-                return answer;
+                return answer; 
             }
         }
     }
 
+    /* accept a choice from user (drawn over interaction area)
+     * +------------------+--------------------------+
+     * |     Variable     |       Description        |
+     * +------------------+--------------------------+
+     * | String prompt    | prompt given to the user |
+     * | String[] choices | list of choices          |
+     * +------------------+--------------------------+
+     */
     public int acceptChoice(String prompt, String[] choices) {
         console.setFont(new Font("Arial", Font.PLAIN, 15));
-        drawToInteractionArea(prompt);
+        drawToInteractionArea(prompt); // draw prompt to interaction area
         for (int i=0; i<choices.length; i++) {
+            // indicate choice using a button
             drawButton(100 + (i%3)*250, INTERACTION_AREA_Y + (CONSOLE_HEIGHT-INTERACTION_AREA_Y)/2 + (i/3)*100, choices[i], (char)(i+'1'), false);
         }
+        // available keys for user to press
         char[] availableLetters = new char[choices.length];
         for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
-        return (int)(acceptChar(availableLetters)-'1');
+        return (int)(acceptChar(availableLetters)-'1'); // return index of choice
     }
 
+    /* accept a character from user
+     *
+     * +------------------+-------------------------+
+     * |     Variable     |       Description       |
+     * +------------------+-------------------------+
+     * | char[] available | available characters    |
+     * | char input       | character input by user |
+     * +------------------+-------------------------+
+     */
     public char acceptChar(char[] available) {
-        char input = console.getChar();
-        for (int i=0; i<available.length; i++) if (input == available[i]) return input;
+        char input = console.getChar(); // get input
+        for (int i=0; i<available.length; i++) if (input == available[i]) return input; // if input character is available, then return it
+
+        // otherwise, ask the user to try again
         new Message("Please enter a valid option.");
         return acceptChar(available);
     }
 
+    /* accept a menu choice from user 
+     * +------------------+--------------------------+
+     * |     Variable     |       Description        |
+     * +------------------+--------------------------+
+     * | String prompt    | prompt given to the user |
+     * | String[] choices | list of choices          |
+     * +------------------+--------------------------+
+     */
     public int acceptMenuChoice(String prompt, String[] choices) {
         console.clear();
         console.setFont(new Font("Arial", Font.PLAIN, 15));
-        console.println(prompt);
+        console.println(prompt); // print prompt to console
         for (int i=0; i<choices.length; i++) {
+            // indicate choice using a button
             drawButton(50 + (i%3)*250, 300 + (i/3)*100, choices[i], (char)(i+'1'), false);
         }
+        // available keys for user to press
         char[] availableLetters = new char[choices.length];
         for (int i=0; i<choices.length; i++) availableLetters[i] = (char)(i+'1');
-        return (int)(acceptChar(availableLetters)-'1');
+        return (int)(acceptChar(availableLetters)-'1'); // return index of choice
     }
 
+    // wait for the user to press any key to continue
     public void pauseProgram() {
         drawToInteractionArea("Press any key to continue.");
         console.getChar();
     }
 
+    /* Main menu of program
+     * Returns true if the user wants to exit the game, false otherwise
+     *
+     * +--------------------------+--------------------------+
+     * |         Variable         |       Description        |
+     * +--------------------------+--------------------------+
+     * | String[] mainMenuChoices | list of choices for user |
+     * | int menuChoice           | choice selected by user  |
+     * +--------------------------+--------------------------+
+     */
     public boolean mainMenu() {
         String[] mainMenuChoices = {"New round", "Leaderboard", "Instructions", "Exit game"};
         int menuChoice = acceptMenuChoice("Please select what you want to do.", mainMenuChoices);
         console.clear();
         if (menuChoice == 0) {
-            if (newRound()) return true;
+            if (newRound()) return true; // user chose to exit within newRound(); return true
         } else if (menuChoice == 1) {
-            leaderboard();
+            leaderboard(); // display leaderboard
         } else if (menuChoice == 2) {
-            instructions();
+            instructions(); // display instructions
         } else {
-            return true;
+            return true; // exit game
         }
-        return false;
+        return false; // do not exit game
     }
 
 
