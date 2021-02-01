@@ -180,23 +180,59 @@ public class WheelOfFortune {
         Collections.sort(playerScores,Collections.reverseOrder());
     }
 
+    /* Draws the splash screen animation
+     *
+     * +---------------+-------------------------------+
+     * |   Variable    |          Description          |
+     * +---------------+-------------------------------+
+     * | char[][] grid | letter grid for splash screen |
+     * | String text   | splash screen text            |
+     * | int row       | current grid row              |
+     * | int col       | current grid column           |
+     * +---------------+-------------------------------+
+     */
+
     private void drawSplashScreen()
     {
         char[][] grid=new char[FS_LETTER_GRID_ROWS][FS_LETTER_GRID_COLS];
-        String text="LOADING";
-        for(int i=0;i<text.length();++i)
+        String text="AMERICA'S\nFAVOURITE\nGAME";
+        final int START_ROW=1;
+        final int START_COL=5;
+        int row=START_ROW,col=START_COL;
+        for(int i=0;i<text.length();++i) // loop over text characters
         {
-            grid[5][5+i]=text.charAt(i);
-            drawFullScreenLetterGrid(grid);
-        try
-        {
-
-        Thread.sleep(200);
+            char c=text.charAt(i);
+            if(c=='\n') // newline; go to next row
+            {
+                ++row;
+                col=START_COL;
+            }
+            else
+            {
+                grid[row][col]=c; // copy character to grid
+                ++col;
+            }
+            drawFullScreenLetterGrid(grid); // display grid
+            try
+            {
+                Thread.sleep(100); // pause for 0.1 seconds
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch(Exception e)
+        for(double angle=0;angle<2;angle+=0.02) // rotate wheel
         {
-            e.printStackTrace();
-        }
+            drawWheel(angle,CONSOLE_WIDTH/2,CONSOLE_HEIGHT*3/5,CONSOLE_HEIGHT*3/10); // draw wheel
+            try
+            {
+                Thread.sleep(20);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -358,6 +394,11 @@ public class WheelOfFortune {
 
     }
 
+    private void drawWheel(double angle)
+    {
+        drawWheel(angle,WHEEL_X,WHEEL_Y,WHEEL_RADIUS);
+    }
+
     /* Draws the spinning wheel for the game
      *
      * +-----------------------------+-------------------------------+
@@ -369,21 +410,20 @@ public class WheelOfFortune {
      * | Graphics2D graphics         | the graphics of bufferedImage |
      * +-----------------------------+-------------------------------+
      */
-    private void drawWheel(double angle)
+    private void drawWheel(double angle,int x,int y,int radius)
     {
-
         final Color[] WHEEL_COLORS={
             Color.LIGHT_GRAY,Color.ORANGE,Color.GREEN,Color.YELLOW,Color.PINK,
             Color.LIGHT_GRAY,Color.CYAN,Color.RED,Color.YELLOW,Color.ORANGE,
             Color.BLACK,Color.CYAN,Color.GREEN,Color.RED,Color.PINK
         };
         
-        BufferedImage bufferedImage=new BufferedImage(WHEEL_RADIUS*2,WHEEL_RADIUS*2,BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bufferedImage=new BufferedImage(radius*2,radius*2,BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics=(Graphics2D)bufferedImage.getGraphics(); // get graphics from bufferedImage
-        drawWheelBaseToGraphics(graphics,WHEEL_COLORS, WHEEL_RADIUS, angle); // draw wheel base to graphics
-        drawWheelTextToGraphics(graphics,WHEEL_RADIUS,angle); // draw wheel text to graphics
+        drawWheelBaseToGraphics(graphics,WHEEL_COLORS, radius, angle); // draw wheel base to graphics
+        drawWheelTextToGraphics(graphics,radius,angle); // draw wheel text to graphics
 
-        console.drawImage(bufferedImage,WHEEL_X-WHEEL_RADIUS,WHEEL_Y-WHEEL_RADIUS,null); // draw the bufferedImage to the console window
+        console.drawImage(bufferedImage,x-radius,y-radius,null); // draw the bufferedImage to the console window
     }
 
     // overload of drawLetterGrid that also draws the available letters
