@@ -1285,7 +1285,7 @@ public class WheelOfFortune
             chatBoxLines.add (formatDialog (HOST_NAME, "It's now your turn " + currentPlayerName + "."));
             drawChatBox (chatBoxLines);
             PLAYER_TURN:
-            while (true)
+            while (loop < NUMBER_OF_PHRASES)
             {
 
                 chatBoxLines.add (formatDialog (HOST_NAME, "Go spin the wheel!"));
