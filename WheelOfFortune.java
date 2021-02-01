@@ -40,10 +40,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Random;
 
 
 public class WheelOfFortune {
     private Console console; // console window
+    private Random rng; // random number generator
 
     public static final String PROGRAM_NAME="Wheel of Fortune 1.0"; // name of the program
 
@@ -164,6 +166,9 @@ public class WheelOfFortune {
 
         // create main console with custom title
         console=new Console(consoleRows,consoleCols,FONT_SIZE,PROGRAM_NAME);
+
+        // initialize random number generator
+        rng=new Random();
 
         // initialize data structures
         phrases=new HashMap();
@@ -1090,7 +1095,7 @@ public class WheelOfFortune {
         // Get a list of phrases available
         List phrasesInCategory=(List)phrases.get(category);
         // Shuffle the list of phrases to ensure they are displayed in random order
-        Collections.shuffle(phrasesInCategory);
+        Collections.shuffle(phrasesInCategory,rng);
         // Variables to store each phrases
         int phraseIndex = -1;
         String phrase = "";
@@ -1209,7 +1214,7 @@ public class WheelOfFortune {
                     Thread.sleep(100);
                 } catch (Exception e) {}
                 // Calculate the initial speed of the wheel
-                spd = Math.random()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
+                spd = rng.nextDouble()*(WHEEL_INIT_VEL_UPPER_BOUND-WHEEL_INIT_VEL_LOWER_BOUND)+WHEEL_INIT_VEL_LOWER_BOUND;
                 while (spd > 0) {
                     // Render the wheel
                     drawWheel(angle);
