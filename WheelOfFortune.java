@@ -1628,7 +1628,7 @@ public class WheelOfFortune
             chatBoxLines.add (formatDialog (HOST_NAME, "Congratulations " + player1Name + ", you are the winner tonight!"));
             chatBoxLines.add (formatDialog (player1Name, "Yayyyy!"));
             chatBoxLines.add (formatDialog (player1Name, player2Name + ", you were an amazing player too!"));
-            chatBoxLines.add (formatDialog (player2Name, "Noo, congraultulations, " + player1Name + "!"));
+            chatBoxLines.add (formatDialog (player2Name, "Noo, congratulations, " + player1Name + "!"));
             chatBoxLines.add (formatDialog (player2Name, "You are the winner tonight!"));
             drawChatBox (chatBoxLines);
         }
@@ -1637,7 +1637,7 @@ public class WheelOfFortune
             // Player 2 Won
             chatBoxLines.add (formatDialog (HOST_NAME, "Congratulations " + player2Name + ", you won tonight!"));
             chatBoxLines.add (formatDialog (player2Name, "Really?"));
-            chatBoxLines.add (formatDialog (player1Name, "Congraultations, " + player2Name + ", you were amazing!"));
+            chatBoxLines.add (formatDialog (player1Name, "Congratulations, " + player2Name + ", you were amazing!"));
             chatBoxLines.add (formatDialog (player2Name, "Thanks! You were amazing too!"));
             drawChatBox (chatBoxLines);
         }
