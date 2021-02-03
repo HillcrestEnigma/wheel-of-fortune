@@ -50,8 +50,7 @@ public class WheelOfFortune
 
     public static final String PROGRAM_NAME = "Wheel of Fortune 1.0"; // name of the program
 
-    // CHANGED FOR DEMONSTRATION PURPOSES
-    public static final int NUMBER_OF_PHRASES = 3; // number of phrases per round
+    public static final int NUMBER_OF_PHRASES = 10; // number of phrases per round
 
     // dimensions of console
     public static final int CONSOLE_WIDTH = 1024;
@@ -171,7 +170,7 @@ public class WheelOfFortune
         console = new Console (consoleRows, consoleCols, FONT_SIZE, PROGRAM_NAME);
 
         // initialize random number generator
-        rng = new Random (12360666); // seed rng for DEMONSTRATION PURPOSES
+        rng = new Random ();
 
         // initialize data structures
         phrases = new HashMap ();
